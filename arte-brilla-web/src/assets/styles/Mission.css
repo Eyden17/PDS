@@ -1,0 +1,163 @@
+.mission-section {
+  padding: 4rem 1rem;
+  background: white;
+}
+
+.container {
+  max-width: 1450px;
+  margin: 0 auto;
+  padding: 0 3rem;
+}
+
+.mission-content {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 4rem;
+  align-items: flex-start;
+}
+
+.mission-text h2 {
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  color: #6d28d9;
+  margin-bottom: 1.5rem;
+  font-weight: 800;
+}
+
+.mission-text p {
+  font-size: 1.05rem;
+  color: #4b5563;
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+
+.mission-highlights {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.highlight-item {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f5f3ff 0%, #faf8ff 100%);
+  border-radius: 12px;
+  border-left: 4px solid #8b5cf6;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.highlight-item:hover {
+  transform: translateX(8px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
+}
+
+.highlight-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.highlight-item h3 {
+  font-size: 1.3rem;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.highlight-item p {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mission-section {
+    padding: 3rem 1rem;
+  }
+
+  .mission-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .mission-text h2 {
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
+  }
+
+  .mission-text p {
+    font-size: 1rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .mission-highlights {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .mission-section {
+    padding: 2.5rem 1rem;
+  }
+
+  .mission-text h2 {
+    font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+    margin-bottom: 1rem;
+  }
+
+  .mission-text p {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+
+  .highlight-item {
+    padding: 1.2rem;
+    border-left: 3px solid #8b5cf6;
+  }
+
+  .highlight-icon {
+    font-size: 1.5rem;
+  }
+
+  .highlight-item h3 {
+    font-size: 1.1rem;
+  }
+
+  .highlight-item p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mission-section {
+    padding: 2rem 0.75rem;
+  }
+
+  .mission-text h2 {
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
+    margin-bottom: 0.75rem;
+  }
+
+  .mission-text p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 0.8rem;
+  }
+
+  .mission-highlights {
+    gap: 1rem;
+  }
+
+  .highlight-item {
+    padding: 1rem;
+  }
+
+  .highlight-icon {
+    font-size: 1.3rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .highlight-item h3 {
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+  }
+}
