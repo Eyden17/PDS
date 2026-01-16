@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
 import '../styles/ReportManagement.css';
+import logo from '../images/logoArteBrilla.png';
 
 const ReportManagement = () => {
   const [filterMes, setFilterMes] = useState('');
@@ -82,7 +83,12 @@ const ReportManagement = () => {
 
       {/* DASHBOARD WEB */}
       <div className="report-management" ref={reportRef}>
-        
+        <div className="report-header">
+          <img src={logo} alt="Arte Brilla" className="report-logo" />
+          <h2>Reporte de Cobranza</h2>
+          <p>Resumen de pagos y deudas</p>
+        </div>
+
         {/* Filtros */}
         <div className="report-filters">
           <div className="filter-group">

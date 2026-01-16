@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Apply Home Section Layout changes",
+			"type": "shell",
+			"command": "echo 'Applying layout changes'",
+			"args": [],
+			"isBackground": false
+		}
+	]
+}

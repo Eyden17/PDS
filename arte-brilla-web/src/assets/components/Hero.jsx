@@ -16,53 +16,16 @@ const Hero = () => {
 
       {/* Contenido principal */}
       <div className="hero-content">
-        {/* Badge */}
-        <div className="badge">
-          <span className="badge-icon">🎭</span>
-          <span>Inscripciones Abiertas 2025</span>
-        </div>
+      {/* Título principal */}
+      <h1 className="main-title">
+        La danza transmite<br />
+        <span className="highlight">el ritmo que hay dentro de ti</span>
+      </h1>
 
-        {/* Título principal */}
-        <h1 className="main-title">
-          Donde tu talento<br />
-          <span className="highlight">brilla</span>
-        </h1>
+      <div className="hero-underline"></div>
 
-        {/* Subtítulo */}
-        <p className="subtitle">
-          Formación integral en danza. Clases para Babies, Minies y Artes Proféticas.<br />
-          Instructores certificados, metodología profesional, reconocimiento oficial.
-        </p>
-
-        {/* Botones CTA */}
-        <div className="cta-buttons">
-          <button className="btn btn-primary">
-            Explorar Clases
-          </button>
-          <button className="btn btn-secondary">
-            Contactar
-          </button>
-        </div>
-
-        {/* Stats */}
-        <div className="hero-stats">
-          <div className="stat-item">
-            <div className="stat-value">500+</div>
-            <div className="stat-label">Estudiantes</div>
-          </div>
-          <div className="stat-divider"></div>
-          <div className="stat-item">
-            <div className="stat-value">15+</div>
-            <div className="stat-label">Años</div>
-          </div>
-          <div className="stat-divider"></div>
-          <div className="stat-item">
-            <div className="stat-value">20+</div>
-            <div className="stat-label">Eventos</div>
-          </div>
-        </div>
-      </div>
     </div>
+  </div>
   );
 };
 

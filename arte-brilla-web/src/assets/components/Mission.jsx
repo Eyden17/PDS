@@ -9,10 +9,7 @@ const Mission = () => {
           <div className="mission-text">
             <h2>Nuestra Misión</h2>
             <p>
-              En Arte Brilla, nos dedicamos a formar integralmente a nuestros estudiantes a través de la danza como medio de expresión artística y personal. Buscamos desarrollar talento, confianza y amor por el arte en cada uno de nuestros alumnos, trabajando en colaboración con la comunidad y bajo estándares de calidad profesional.
-            </p>
-            <p>
-              Con alianza del SINEM (Sistema Nacional de Educación Musical), garantizamos un reconocimiento oficial de nuestras actividades y nos mantenemos versátiles para participar en eventos culturales significativos.
+              Formar bailarines íntegros mediante una educación profesional y afectiva, promoviendo técnica, creatividad y valores en un entorno seguro y respetuoso.
             </p>
           </div>
 
@@ -20,17 +17,12 @@ const Mission = () => {
             <div className="highlight-item">
               <div className="highlight-icon">🎭</div>
               <h3>Formación Integral</h3>
-              <p>Desarrollo artístico, físico y emocional</p>
-            </div>
-            <div className="highlight-item">
-              <div className="highlight-icon">🤝</div>
-              <h3>Comunidad</h3>
-              <p>Trabajo colaborativo con la sociedad</p>
+              <p>Desarrollo técnico y expresivo</p>
             </div>
             <div className="highlight-item">
               <div className="highlight-icon">✓</div>
-              <h3>Calidad</h3>
-              <p>Reconocimiento oficial SINEM</p>
+              <h3>Calidad y Reconocimiento</h3>
+              <p>Programas avalados y docentes certificados</p>
             </div>
           </div>
         </div>

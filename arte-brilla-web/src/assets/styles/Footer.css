@@ -162,6 +162,12 @@
   overflow: hidden;
 }
 
+.social-icon-svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
 .social-icon::before {
   content: '';
   position: absolute;
@@ -275,6 +281,15 @@
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.75);
   transition: all 0.3s ease;
+}
+
+.contact-info-compact a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.contact-info-compact a:hover {
+  color: #f4a460;
 }
 
 .contact-info-compact p:hover {

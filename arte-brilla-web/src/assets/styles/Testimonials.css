@@ -1,6 +1,6 @@
 .testimonials-section {
   padding: 5rem 1rem;
-  background: white;
+  background: transparent; /* Unificado con fondo global */
   position: relative;
   overflow: hidden;
 }
@@ -12,10 +12,10 @@
   right: -10%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+  background: none; /* decorativo desactivado */
   border-radius: 50%;
   pointer-events: none;
-  animation: float 8s ease-in-out infinite;
+  animation: none;
 }
 
 .testimonials-section::after {
@@ -25,10 +25,10 @@
   left: -15%;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(244, 164, 96, 0.08) 0%, transparent 70%);
+  background: none; /* decorativo desactivado */
   border-radius: 50%;
   pointer-events: none;
-  animation: float 10s ease-in-out infinite reverse;
+  animation: none;
 }
 
 @keyframes float {
@@ -37,18 +37,18 @@
 }
 
 .section-header {
-  text-align: left;
-  margin-bottom: 3.5rem;
-  padding-left: 2rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 0 1rem;
   position: relative;
   z-index: 2;
 }
 
 .section-header h2 {
-  font-size: clamp(2rem, 5vw, 3rem);
-  color: #6d28d9;
-  margin-bottom: 1rem;
-  font-weight: 800;
+  font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+  color: #3b0764;
+  margin-bottom: 0.5rem;
+  font-weight: 900;
 }
 
 .section-header p {

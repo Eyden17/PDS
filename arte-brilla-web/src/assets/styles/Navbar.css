@@ -71,6 +71,15 @@
   transition: all 0.5s ease;
 }
 
+.logo-image {
+  height: 68px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
 @keyframes logoSpin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -80,39 +89,85 @@
   font-size: 1.75rem;
 }
 
+.navbar.scrolled .logo-image {
+  height: 48px;
+}
+
 .logo-text-wrapper {
   display: flex;
   flex-direction: column;
   gap: 0;
   transition: all 0.5s ease;
+  align-items: flex-start;
 }
 
 .navbar.scrolled .logo-subtitle {
   opacity: 0.6;
   font-size: 0.55rem;
 }
+
+.arte-line {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  line-height: 1;
 }
 
-.logo-text {
+.arrow-symbol {
+  font-family: 'Arial', sans-serif;
+  font-weight: 700;
   font-size: 1.5rem;
-  font-weight: 900;
-  background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%);
+  color: #4a5568;
+  line-height: 1;
+}
+
+.arte-text {
+  font-family: 'Arial', 'Helvetica Neue', sans-serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: #4a5568;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  line-height: 1;
+  font-stretch: normal;
+}
+
+.brilla-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 0.3rem;
+}
+
+.brilla-text {
+  font-family: 'Brush Script MT', 'Lucida Handwriting', cursive;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 2.2rem;
+  background: linear-gradient(135deg, #a855f7 0%, #d946ef 50%, #ec4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  letter-spacing: -0.8px;
-  white-space: nowrap;
-  margin: 0;
-  line-height: 1.2;
+  letter-spacing: 0px;
+  line-height: 0.9;
+}
+
+.brilla-underline {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #a855f7 0%, #d946ef 50%, #ec4899 100%);
+  margin-top: -2px;
 }
 
 .logo-subtitle {
   font-size: 0.65rem;
-  font-weight: 600;
-  color: #8b5cf6;
+  font-weight: 500;
+  color: #4a5568;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 4px;
   white-space: nowrap;
+  margin-left: 0.3rem;
+  margin-top: -0.1rem;
 }
 
 .logo-wrapper:hover {

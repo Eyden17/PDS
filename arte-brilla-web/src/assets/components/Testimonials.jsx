@@ -36,31 +36,12 @@ const Testimonials = () => {
       author: "Elena Martínez",
       role: "Abuela de estudiante",
       rating: 5
-    },
-    {
-      id: 5,
-      quote: "Recomiendo Arte Brilla a todos. La atención al detalle y pasión por la danza es inspiradora.",
-      author: "Patricia Sánchez",
-      role: "Madre de estudiante Minies",
-      rating: 5
-    },
-    {
-      id: 6,
-      quote: "Las clases son excelentes y el equipo es muy profesional. Mi hijo ha aprendido mucho.",
-      author: "Carlos Mendoza",
-      role: "Padre de estudiante",
-      rating: 5
     }
   ];
 
   return (
     <section className="testimonials-section">
       <div className="container">
-        <div className="section-header">
-          <h2>Lo que dicen nuestros estudiantes</h2>
-          <p>Testimonios de familias que confían en nuestro trabajo</p>
-        </div>
-
         <div className="carousel-wrapper">
           <Swiper
             modules={[Navigation, Pagination, Autoplay, EffectFade]}

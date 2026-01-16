@@ -1,0 +1,20 @@
+.events-section { padding: 2rem 1rem; }
+
+.events-list { display: grid; gap: 1rem; }
+
+.event-card { display: flex; gap: 1rem; align-items: flex-start; background: white; padding: 1rem; border-radius: 10px; box-shadow: 0 8px 20px rgba(16,24,40,0.04); }
+.date-chip { width: 64px; min-width: 64px; height: 64px; background: linear-gradient(180deg,#6d28d9,#a78bfa); color: white; border-radius: 8px; display:flex; align-items:center; justify-content:center; flex-direction: column; font-weight:700; }
+.date-chip .day { font-size: 1.1rem; }
+.date-chip .month { font-size: 0.75rem; opacity: 0.95; }
+
+.event-body .event-title { margin: 0 0 0.25rem; font-size: 1.05rem; }
+.event-body .meta { color: #6b7280; font-size: 0.9rem; margin-bottom: 0.6rem; }
+.event-body .event-desc { margin: 0 0 0.75rem; color:#374151; }
+.actions { display:flex; gap:0.6rem; }
+.btn { background:#6d28d9;color:white;border:none;padding:0.45rem 0.8rem;border-radius:6px;cursor:pointer;font-weight:700 }
+.btn-outline { background:transparent;border:2px solid #6d28d9;color:#6d28d9 }
+
+@media (max-width: 720px) {
+  .event-card { flex-direction: row; }
+  .date-chip { width:56px;height:56px }
+}

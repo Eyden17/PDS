@@ -3,10 +3,11 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './assets/components/Navbar';
 import Hero from './assets/components/Hero';
-import Mission from './assets/components/Mission';
+import NewsGallery from './assets/components/NewsGallery';
 import DanceAreas from './assets/components/DanceAreas';
 import Team from './assets/components/Team';
-import Testimonials from './assets/components/Testimonials';
+import Events from './assets/components/Events';
+
 import ImportantInfo from './assets/components/ImportantInfo';
 import About from './assets/components/About';
 import Classes from './assets/components/Classes';
@@ -28,11 +29,10 @@ function App() {
               <Route path="/" element={
                 <>
                   <Hero />
-                  <Mission />
-                  <DanceAreas />
-                  <Team />
-                  <Testimonials />
+                  <Events />
                   <ImportantInfo />
+                  <NewsGallery />
+                  <DanceAreas />
                 </>
               } />
               <Route path="/about" element={<About />} />

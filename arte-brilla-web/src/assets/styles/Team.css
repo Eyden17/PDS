@@ -1,13 +1,19 @@
 .team-section {
-  padding: 5rem 1rem;
-  background: linear-gradient(135deg, #f5f3ff 0%, #faf8ff 100%);
+  padding: 0; /* spacing controlled by .site-section */
+  background: transparent; /* Unificado con fondo global */
 }
 
 .section-header {
-  text-align: left;
-  margin-bottom: 3.5rem;
-  padding-left: 2rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 0 1rem;
 }
+
+.teacher-image {
+  overflow: hidden;
+  height: 280px;
+  background: #f8fafc; /* Fondo neutro para las imágenes */
+} 
 
 .section-header h2 {
   font-size: clamp(2rem, 5vw, 3rem);
@@ -165,4 +171,152 @@
   .specialty {
     font-size: 0.75rem;
   }
+}
+
+/* New team layout styles */
+.director-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.person-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 8px 20px rgba(16,24,40,0.06);
+}
+
+.person-image img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* Icon placeholders */
+.person-card .person-icon {
+  width: 120px;
+  height: 120px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(109,40,217,0.08), rgba(244,164,96,0.02));
+  color: #6d28d9;
+}
+
+.person-card.small .person-icon {
+  width: 90px;
+  height: 90px;
+  border-radius: 10px;
+}
+
+.person-card.small .person-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+.person-info h3, .person-info h4 {
+  margin: 0;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.person-info .role {
+  margin: 0.25rem 0 0 0;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.subheading {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #3b0764;
+  margin-bottom: 0.75rem;
+}
+
+.docentes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.person-card.small {
+  padding: 0.9rem;
+}
+
+.person-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(109,40,217,0.08), rgba(244,164,96,0.02));
+  color: #6d28d9;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+}
+
+.staff-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.5rem;
+  margin: 0 0 1.25rem 0;
+}
+
+.staff-list li {
+  padding: 0.6rem 0.8rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(16,24,40,0.04);
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.coordinator-card {
+  background: white;
+  border-left: 4px solid #6d28d9;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+@media (max-width: 640px) {
+  .director-wrapper { flex-direction: column; align-items: flex-start; }
+  .person-image img { width: 100%; height: auto; border-radius: 8px; }
+  .docentes-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Team swiper */
+.team-swiper-wrapper {
+  position: relative;
+  padding: 0.5rem 0 1.5rem 0;
+}
+
+.team-swiper .swiper-slide {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.team-prev { left: -50px; }
+.team-next { right: -50px; }
+
+@media (max-width: 768px) {
+  .team-prev { left: -30px; }
+  .team-next { right: -30px; }
+}
+
+@media (max-width: 480px) {
+  .team-prev, .team-next { display: none; }
 }

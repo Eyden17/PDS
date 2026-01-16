@@ -364,6 +364,39 @@ table {
   transition-duration: 200ms;
 }
 
+/* Site section uniform layout */
+.site-section {
+  padding: 4rem 0;
+}
+
+/* Reduce top padding for the first section (hero handles its own layout) */
+.site-section:first-of-type {
+  padding-top: 2.5rem;
+}
+
+/* Subtle divider between sections */
+.site-section + .site-section {
+  border-top: 1px solid rgba(16,24,40,0.03);
+}
+
+.site-section .section-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding: 0 1rem;
+}
+
+.site-section .section-header h2 {
+  font-size: clamp(1.6rem, 4.5vw, 2.4rem);
+  color: #3b0764;
+  margin-bottom: 0.25rem;
+}
+
+.site-section .section-header .muted {
+  color: #6b7280;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
 /* Print styles */
 @media print {
   body {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
 import '../styles/Navbar.css'
+import logo from '../images/logoArteBrilla.png';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -31,10 +32,13 @@ const Navbar = () => {
       <div className="navbar-container">
         {/* Logo de la Academia */}
         <Link to="/" className="logo-wrapper" onClick={() => setIsMenuOpen(false)}>
-          <div className="logo-icon">✨</div>
           <div className="logo-text-wrapper">
-            <span className="logo-text">Arte Brilla</span>
-            <span className="logo-subtitle">Academia de Danza</span>
+            <span className="arte-text">ARTE</span>
+            <div className="brilla-container">
+              <span className="brilla-text">Brilla</span>
+              <div className="brilla-underline"></div>
+            </div>
+            <span className="logo-subtitle">DANCE STUDIO</span>
           </div>
         </Link>
 

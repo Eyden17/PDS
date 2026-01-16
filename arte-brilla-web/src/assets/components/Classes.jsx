@@ -6,9 +6,10 @@ function Classes() {
   const [selectedArea, setSelectedArea] = useState(null);
 
   const areas = [
-    { id: 'Babies', label: 'Babies', color: '#ec4899', icon: '👶', description: '3-5 años' },
-    { id: 'Minies', label: 'Minies', color: '#8b5cf6', icon: '🎀', description: '6+ años' },
-    { id: 'Artes Proféticas', label: 'Artes Proféticas', color: '#f4a460', icon: '✨', description: 'Todas las edades' }
+    { id: 'Arte Brilla Babys', label: 'Arte Brilla Babys', color: '#ec4899', icon: '👶', description: '3-5 años' },
+    { id: 'Baby Shine', label: 'Baby Shine', color: '#22d3ee', icon: '🌟', description: '4-6 años' },
+    { id: 'Arte Brilla Minis', label: 'Arte Brilla Minis', color: '#8b5cf6', icon: '🎀', description: '6+ años' },
+    { id: 'Arte Profética Brilla', label: 'Arte Profética Brilla', color: '#f4a460', icon: '✨', description: 'Todas las edades' }
   ];
 
   const getClassesByArea = (areaId) => {
@@ -65,44 +66,53 @@ function Classes() {
             </button>
           </div>
 
-          <div className="classes-list">
-            {getClassesByArea(selectedArea).map(clase => (
-              <div key={clase.id} className="class-item">
-                <div className="class-left">
-                  <div 
-                    className="class-color-bar"
-                    style={{ backgroundColor: clase.color }}
-                  ></div>
-                  <div className="class-content">
-                    <h4>{clase.name}</h4>
-                    <p className="class-instructor">👨‍🏫 {clase.instructor}</p>
-                    <p className="class-level">📚 {clase.level}</p>
+          {getClassesByArea(selectedArea).length === 0 ? (
+            <div className="classes-empty">
+              <p className="empty-emoji">⏳</p>
+              <h3>Pronto publicaremos los horarios de este equipo</h3>
+              <p>Estamos ajustando la oferta. Escríbenos para más detalles o reserva tu interés.</p>
+              <button className="class-action-btn" style={{ backgroundColor: '#6b7280' }}>Contactar</button>
+            </div>
+          ) : (
+            <div className="classes-list">
+              {getClassesByArea(selectedArea).map(clase => (
+                <div key={clase.id} className="class-item">
+                  <div className="class-left">
+                    <div 
+                      className="class-color-bar"
+                      style={{ backgroundColor: clase.color }}
+                    ></div>
+                    <div className="class-content">
+                      <h4>{clase.name}</h4>
+                      <p className="class-instructor">👨‍🏫 {clase.instructor}</p>
+                      <p className="class-level">📚 {clase.level}</p>
+                    </div>
                   </div>
+
+                  <div className="class-details">
+                    <span className="detail-item">
+                      <strong>📅</strong> {clase.schedule}
+                    </span>
+                    <span className="detail-item">
+                      <strong>⏰</strong> {clase.time}
+                    </span>
+                    <span className="detail-item">
+                      <strong>👥</strong> {clase.capacity}
+                    </span>
+                  </div>
+
+                  <p className="class-description">{clase.description}</p>
+
+                  <button 
+                    className="class-action-btn"
+                    style={{ backgroundColor: clase.color }}
+                  >
+                    Inscribirse
+                  </button>
                 </div>
-
-                <div className="class-details">
-                  <span className="detail-item">
-                    <strong>📅</strong> {clase.schedule}
-                  </span>
-                  <span className="detail-item">
-                    <strong>⏰</strong> {clase.time}
-                  </span>
-                  <span className="detail-item">
-                    <strong>👥</strong> {clase.capacity}
-                  </span>
-                </div>
-
-                <p className="class-description">{clase.description}</p>
-
-                <button 
-                  className="class-action-btn"
-                  style={{ backgroundColor: clase.color }}
-                >
-                  Inscribirse
-                </button>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
       )}
 
@@ -122,7 +132,12 @@ function Classes() {
         <div className="cta-wrapper">
           <h2>¿Tienes dudas sobre nuestras clases?</h2>
           <p>Contáctanos para más información o solicita una clase de prueba</p>
-          <button className="cta-button">Contactar Ahora</button>
+          <button
+            className="cta-button"
+            onClick={() => { window.location.href = 'http://localhost:5173/contact'; }}
+          >
+            Contactar Ahora
+          </button>
         </div>
       </section>
     </div>
