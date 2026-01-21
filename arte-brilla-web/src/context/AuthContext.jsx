@@ -3,53 +3,55 @@ import { AuthContext } from './AuthContextProvider';
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null); // { role, email, id }
   const [loading, setLoading] = useState(true);
 
-  // Contraseña maestra para admin (en producción, esto vendría de un backend)
-  const ADMIN_PASSWORD = 'AdminArteBrilla2025';
+  const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 
-  // Verificar autenticación al cargar la página
   useEffect(() => {
-    const storedAuth = localStorage.getItem('isAdminAuthenticated');
-    
-    // Usar un callback para evitar cascading renders
-    const initAuth = () => {
-      if (storedAuth === 'true') {
-        setIsAuthenticated(true);
-        setUser({ role: 'admin' });
-      }
-      setLoading(false);
-    };
-    
-    initAuth();
+    const raw = localStorage.getItem('ab_session');
+    if (raw) {
+      const session = JSON.parse(raw);
+      setIsAuthenticated(true);
+      setUser(session.user);
+    }
+    setLoading(false);
   }, []);
 
-  const login = (password) => {
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      setUser({ role: 'admin' });
-      localStorage.setItem('isAdminAuthenticated', 'true');
-      return { success: true };
+  const login = async (email, password) => {
+    const res = await fetch(`${API_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const body = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      return { success: false, message: body.error || 'Login failed' };
     }
-    return { success: false, message: 'Contraseña incorrecta' };
+
+    const session = {
+      accessToken: body.accessToken,
+      user: { id: body.user.id, email: body.user.email, role: body.role }
+    };
+
+    localStorage.setItem('ab_session', JSON.stringify(session));
+    setIsAuthenticated(true);
+    setUser(session.user);
+
+    return { success: true, role: body.role };
   };
 
   const logout = () => {
+    localStorage.removeItem('ab_session');
     setIsAuthenticated(false);
     setUser(null);
-    localStorage.removeItem('isAdminAuthenticated');
   };
 
-  const value = {
-    isAuthenticated,
-    user,
-    loading,
-    login,
-    logout,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ isAuthenticated, user, loading, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
-
-

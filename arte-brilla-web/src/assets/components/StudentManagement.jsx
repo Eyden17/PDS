@@ -1,15 +1,13 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { studentService } from '../../services/studentService';
 import '../styles/StudentManagement.css';
 
 const StudentManagement = () => {
-  const [students, setStudents] = useState([
-    { id: 1, nombre: 'Pedro', apellido: 'González', segundoApellido: 'López', edad: '4', encargado: 'María López', telefonoEncargado: '+506 8765 4321', observaciones: 'Estudiante muy activo', grupo: 'Babies (3-5 años)', activo: true },
-    { id: 2, nombre: 'Sofia', apellido: 'Rodríguez', segundoApellido: 'García', edad: '3', encargado: 'Carlos García', telefonoEncargado: '+506 8754 3210', observaciones: 'Primera vez en danza', grupo: 'Babies (3-5 años)', activo: true },
-    { id: 3, nombre: 'Lucas', apellido: 'Martínez', segundoApellido: 'Pérez', edad: '7', encargado: 'Ana Pérez', telefonoEncargado: '+506 8743 2109', observaciones: '', grupo: 'Minies (6+ años)', activo: true },
-    { id: 4, nombre: 'Emma', apellido: 'Fernández', segundoApellido: 'Ramírez', edad: '6', encargado: 'Juan Ramírez', telefonoEncargado: '+506 8732 1098', observaciones: 'Talento natural', grupo: 'Minies (6+ años)', activo: true },
-    { id: 5, nombre: 'Diego', apellido: 'Sánchez', segundoApellido: 'Morales', edad: '12', encargado: 'Rosa Morales', telefonoEncargado: '+506 8721 0987', observaciones: 'Considera carrera en danza', grupo: 'Minies (6+ años)', activo: false },
-    { id: 6, nombre: 'Isabella', apellido: 'Torres', segundoApellido: 'Castro', edad: '15', encargado: 'Pablo Castro', telefonoEncargado: '+506 8710 9876', observaciones: '', grupo: 'Artes Proféticas', activo: true },
-  ]);
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const showTable = !loading && !error;
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -32,11 +30,68 @@ const StudentManagement = () => {
     activo: true
   });
 
+  // TODO: ajustar según datos reales de backend
   const grupos = [
     { label: 'Babies (3-5 años)', icon: '👶', color: '#ec4899' },
     { label: 'Minies (6+ años)', icon: '🎀', color: '#8b5cf6' },
     { label: 'Artes Proféticas', icon: '✨', color: '#f4a460' }
   ];
+
+  const fetchStudents = async () => {
+    try {
+      setLoading(true);
+      const res = await studentService.getAllStudents({ limit: 100, offset: 0 });
+
+      // backend recomendado: { data: [...] }
+      const rows = res?.data ?? res ?? [];
+
+      console.log('Fetched students:', rows);
+
+      // Mapeo a tu forma actual de UI
+      const mapped = rows.map((s) => {
+        const age =
+          s.birth_date
+            ? Math.max(0, new Date().getFullYear() - new Date(s.birth_date).getFullYear())
+            : '';
+
+        // convertir group_name ("Babies") a label UI ("Babies (3-5 años)")
+        const grupoLabel =
+          s.group_name === 'Babies' ? 'Babies (3-5 años)' :
+          s.group_name === 'Minies' ? 'Minies (6+ años)' :
+          s.group_name === 'Artes Proféticas' ? 'Artes Proféticas' :
+          '';
+
+        return {
+          id: s.id,
+          nombre: s.first_name ?? '',
+          apellido: s.last_name ?? '',
+          segundoApellido: '',
+          edad: age ? String(age) : '',
+          encargado: s.guardian_name ?? '',
+          telefonoEncargado: s.guardian_phone ?? '',
+          observaciones: s.condition_notes ?? '',
+          grupo: grupoLabel,
+          activo: Boolean(s.is_active),
+
+          // extra opcional (si luego lo querés mostrar)
+          classId: s.class_id ?? null,
+          className: s.class_name ?? null
+        };
+      });
+
+      setStudents(mapped);
+      setError(null);
+    } catch (err) {
+      setError(err.message || 'Error cargando estudiantes');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStudents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -390,10 +445,22 @@ const StudentManagement = () => {
 
       {/* Tabla de Estudiantes */}
       <div className="students-table-container">
-        {filteredStudents.length === 0 ? (
+
+        {loading && (
           <div className="empty-state">
-            <p>📚 {students.length === 0 ? 'No hay estudiantes registrados' : 'No hay resultados con los filtros seleccionados'}</p>
-            {students.length === 0 && <small>Haz clic en "Agregar Estudiante" para comenzar</small>}
+            <p>⏳ Cargando estudiantes...</p>
+          </div>
+        )}
+
+        {!loading && error && (
+          <div className="empty-state">
+            <p>⚠️ {error}</p>
+          </div>
+        )}
+
+        {showTable && (filteredStudents.length === 0 ? (
+          <div className="empty-state">
+            <p>No hay estudiantes registrados</p>
           </div>
         ) : (
           <table className="students-table">
@@ -459,7 +526,7 @@ const StudentManagement = () => {
               ))}
             </tbody>
           </table>
-        )}
+        ))}
       </div>
 
       <div className="management-footer">

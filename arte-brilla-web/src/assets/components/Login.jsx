@@ -4,28 +4,32 @@ import { useAuth } from '../../context/useAuth';
 import '../styles/Login.css';
 
 const Login = () => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
-    // Simular pequeña demora para mejor UX
-    setTimeout(() => {
-      const result = login(password);
-      if (result.success) {
-        navigate('/admin');
-      } else {
-        setError(result.message);
-        setPassword('');
-      }
-      setIsLoading(false);
-    }, 300);
+    const result = await login(email, password);
+
+    if (result.success) {
+      // BD: OWNER/ADMIN -> admin panel, TEACHER -> teacher panel
+      // Yo recomendaria cambiar /admin a /dashboard o similar
+      if (result.role === 'OWNER' || result.role === 'ADMIN') navigate('/admin');
+      else if (result.role === 'TEACHER') navigate('/teacher');
+      else setError('Rol no reconocido');
+    } else {
+      setError(result.message || 'Credenciales inválidas');
+      setPassword('');
+    }
+
+    setIsLoading(false);
   };
 
   return (
@@ -39,24 +43,36 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
-            <label htmlFor="password">Contraseña de Administrador</label>
+            <label htmlFor="email">Correo</label>
             <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Ingresa la contraseña"
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="correo@ejemplo.com"
               disabled={isLoading}
               autoFocus
             />
           </div>
 
+          <div className="form-group">
+            <label htmlFor="password">Contraseña</label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Ingresa tu contraseña"
+              disabled={isLoading}
+            />
+          </div>
+
           {error && <div className="error-message">{error}</div>}
 
-          <button
+          <button 
             type="submit"
             className="login-button"
-            disabled={isLoading || !password}
+            disabled={isLoading || !email || !password}
           >
             {isLoading ? 'Verificando...' : 'Acceder'}
           </button>
