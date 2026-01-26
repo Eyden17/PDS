@@ -1,0 +1,54 @@
+.not-found {
+  min-height: calc(100vh - 160px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  background: linear-gradient(135deg, #faf7f2, #f0efe8);
+}
+
+.not-found-card {
+  max-width: 560px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px 32px;
+  text-align: center;
+  box-shadow: 0 20px 45px rgba(20, 20, 20, 0.12);
+}
+
+.not-found-code {
+  font-size: 72px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: #d8b286;
+  letter-spacing: 6px;
+}
+
+.not-found-title {
+  font-size: 28px;
+  margin: 0 0 12px;
+  color: #2d2a26;
+}
+
+.not-found-text {
+  margin: 0 0 24px;
+  color: #5a534b;
+  line-height: 1.6;
+}
+
+.not-found-link {
+  display: inline-block;
+  padding: 12px 22px;
+  border-radius: 999px;
+  text-decoration: none;
+  background: #2d2a26;
+  color: #ffffff;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.not-found-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(45, 42, 38, 0.2);
+}

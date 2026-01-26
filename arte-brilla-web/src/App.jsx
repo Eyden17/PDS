@@ -16,6 +16,7 @@ import Footer from './assets/components/Footer';
 import Login from './assets/components/Login';
 import AdminPanel from './assets/components/AdminPanel';
 import ProtectedRoute from './assets/components/ProtectedRoute';
+import NotFound from './assets/components/NotFound';
 import './assets/styles/App.css'
 
 function App() {
@@ -47,6 +48,15 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/admin/*"
+                element={
+                  <ProtectedRoute>
+                    <AdminPanel />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
           <Footer />

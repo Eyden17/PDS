@@ -31,8 +31,10 @@ async function apiFetch(path, options = {}) {
 
   const body = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const msg = body?.error || body?.message || 'Error en API';
-    throw new Error(msg);
+    const apiError = new Error(body?.error || body?.message || 'Error en API');
+    apiError.code = body?.code;
+    apiError.details = body?.details;
+    throw apiError;
   }
 
   return body;

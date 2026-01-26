@@ -6,6 +6,8 @@ const StudentManagement = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [formError, setFormError] = useState('');
+  const [originalFormData, setOriginalFormData] = useState(null);
 
   const showTable = !loading && !error;
 
@@ -19,6 +21,7 @@ const StudentManagement = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   const [formData, setFormData] = useState({
+    cedula: '',
     nombre: '',
     apellido: '',
     segundoApellido: '',
@@ -30,7 +33,6 @@ const StudentManagement = () => {
     activo: true
   });
 
-  // TODO: ajustar según datos reales de backend
   const grupos = [
     { label: 'Babies (3-5 años)', icon: '👶', color: '#ec4899' },
     { label: 'Minies (6+ años)', icon: '🎀', color: '#8b5cf6' },
@@ -61,19 +63,19 @@ const StudentManagement = () => {
           s.group_name === 'Artes Proféticas' ? 'Artes Proféticas' :
           '';
 
+        const [apellido, ...segundoApellido] = (s.last_name ?? '').trim().split(' ');
         return {
           id: s.id,
+          cedula: s.identification ?? '',
           nombre: s.first_name ?? '',
-          apellido: s.last_name ?? '',
-          segundoApellido: '',
+          apellido: apellido ?? '',
+          segundoApellido: segundoApellido[0] ?? '',
           edad: age ? String(age) : '',
           encargado: s.guardian_name ?? '',
           telefonoEncargado: s.guardian_phone ?? '',
           observaciones: s.condition_notes ?? '',
           grupo: grupoLabel,
           activo: Boolean(s.is_active),
-
-          // extra opcional (si luego lo querés mostrar)
           classId: s.class_id ?? null,
           className: s.class_name ?? null
         };
@@ -95,62 +97,238 @@ const StudentManagement = () => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
+    if (formError) setFormError('');
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
   };
 
-  const handleAddStudent = () => {
-    if (!formData.nombre || !formData.apellido || !formData.encargado || !formData.telefonoEncargado || !formData.grupo) {
-      alert('Por favor completa todos los campos requeridos');
+  const isOnlyLettersSpaces = (value) => {
+    if (!value) return true;
+    return /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$/.test(value);
+  };
+
+  const validateForm = () => {
+    if (
+      !formData.cedula?.trim() ||
+      !formData.nombre?.trim() ||
+      !formData.apellido?.trim() ||
+      !formData.encargado?.trim() ||
+      !formData.telefonoEncargado?.trim() ||
+      !formData.grupo
+    ) {
+      return 'Por favor completa todos los campos requeridos (incluida la cédula).';
+    }
+
+    const cedula = formData.cedula.trim();
+    if (!/^\d{9}$/.test(cedula)) {
+      return 'La cédula debe tener exactamente 9 números.';
+    }
+
+    const telefono = formData.telefonoEncargado.trim();
+    if (!/^\d{8}$/.test(telefono)) {
+      return 'El teléfono debe tener exactamente 8 números.';
+    }
+
+    if (formData.edad) {
+      const edad = Number(formData.edad);
+      if (!Number.isFinite(edad) || edad < 3) {
+        return 'La edad debe ser 3 o mayor.';
+      }
+    }
+
+    if (!isOnlyLettersSpaces(formData.nombre)) {
+      return 'El nombre solo puede tener letras y espacios.';
+    }
+
+    if (!isOnlyLettersSpaces(formData.apellido)) {
+      return 'El apellido solo puede tener letras y espacios.';
+    }
+
+    if (formData.segundoApellido && !isOnlyLettersSpaces(formData.segundoApellido)) {
+      return 'El 2do apellido solo puede tener letras y espacios.';
+    }
+
+    if (!isOnlyLettersSpaces(formData.encargado)) {
+      return 'El encargado solo puede tener letras y espacios.';
+    }
+
+    if (formData.observaciones && /[^A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]/.test(formData.observaciones)) {
+      return 'Observaciones contiene caracteres inválidos.';
+    }
+
+    return '';
+  };
+
+  const handleAddStudent = async () => {
+    const validationMessage = validateForm();
+    if (validationMessage) {
+      setFormError(validationMessage);
       return;
     }
 
-    if (editingId) {
-      setStudents(students.map(s => s.id === editingId ? { ...formData, id: editingId } : s));
-      setEditingId(null);
-    } else {
-      const newStudent = {
-        id: Date.now(),
-        ...formData
-      };
-      setStudents([...students, newStudent]);
+    // UI label -> BD group_name
+    const groupName =
+      formData.grupo === 'Babies (3-5 años)' ? 'Babies' :
+      formData.grupo === 'Minies (6+ años)' ? 'Minies' :
+      formData.grupo === 'Artes Proféticas' ? 'Artes Proféticas' :
+      null;
+
+    if (!groupName) {
+      setFormError('Grupo inválido.');
+      return;
     }
-    
-    setFormData({
-      nombre: '',
-      apellido: '',
-      segundoApellido: '',
-      edad: '',
-      encargado: '',
-      telefonoEncargado: '',
-      observaciones: '',
-      grupo: '',
-      activo: true
-    });
-    setShowForm(false);
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const payload = {
+        identification: formData.cedula.trim(),
+        first_name: formData.nombre.trim(),
+        last_name: `${formData.apellido.trim()}${formData.segundoApellido?.trim() ? ` ${formData.segundoApellido.trim()}` : ''}`,
+        age: formData.edad ? Number(formData.edad) : null,
+        guardian_name: formData.encargado.trim(),
+        guardian_phone: formData.telefonoEncargado.trim(),
+        condition_notes: formData.observaciones?.trim() || null,
+        is_active: Boolean(formData.activo),
+        group_name: groupName
+      };
+
+      // Crear / Actualizar vía API
+      if (editingId) {
+        if (originalFormData) {
+          const normalizedCurrent = {
+            ...formData,
+            cedula: formData.cedula.trim(),
+            nombre: formData.nombre.trim(),
+            apellido: formData.apellido.trim(),
+            segundoApellido: formData.segundoApellido?.trim() || '',
+            encargado: formData.encargado.trim(),
+            telefonoEncargado: formData.telefonoEncargado.trim(),
+            observaciones: formData.observaciones?.trim() || '',
+            edad: formData.edad ? String(Number(formData.edad)) : '',
+            grupo: formData.grupo,
+            activo: Boolean(formData.activo)
+          };
+          const normalizedOriginal = {
+            ...originalFormData,
+            cedula: originalFormData.cedula.trim(),
+            nombre: originalFormData.nombre.trim(),
+            apellido: originalFormData.apellido.trim(),
+            segundoApellido: originalFormData.segundoApellido?.trim() || '',
+            encargado: originalFormData.encargado.trim(),
+            telefonoEncargado: originalFormData.telefonoEncargado.trim(),
+            observaciones: originalFormData.observaciones?.trim() || '',
+            edad: originalFormData.edad ? String(Number(originalFormData.edad)) : '',
+            grupo: originalFormData.grupo,
+            activo: Boolean(originalFormData.activo)
+          };
+
+          if (JSON.stringify(normalizedCurrent) === JSON.stringify(normalizedOriginal)) {
+            setFormError('No hay cambios para guardar.');
+            return;
+          }
+        }
+
+        await studentService.updateStudent(editingId, payload);
+        setEditingId(null);
+      } else {
+        const exists = students.some(s => s.cedula === formData.cedula.trim());
+        if (exists) {
+          setFormError('Ya existe un estudiante con esa cédula.');
+          return;
+        }
+        await studentService.createStudent(payload);
+      }
+
+      await fetchStudents();
+      setFormData({
+        cedula: '',
+        nombre: '',
+        apellido: '',
+        segundoApellido: '',
+        edad: '',
+        encargado: '',
+        telefonoEncargado: '',
+        observaciones: '',
+        grupo: '',
+        activo: true
+      });
+
+      setShowForm(false);
+      setOriginalFormData(null);
+    } catch (err) {
+      if (err?.code === 'DUPLICATE_IDENTIFICATION') {
+        setFormError('Ya existe un estudiante con esa cédula.');
+      } else {
+        setError(err.message || 'Error guardando estudiante');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
+
   const handleEditStudent = (student) => {
-    setFormData(student);
+    setFormError('');
+    setOriginalFormData({
+      cedula: student.cedula ?? '',
+      nombre: student.nombre ?? '',
+      apellido: student.apellido ?? '',
+      segundoApellido: student.segundoApellido ?? '',
+      edad: student.edad ?? '',
+      encargado: student.encargado ?? '',
+      telefonoEncargado: student.telefonoEncargado ?? '',
+      observaciones: student.observaciones ?? '',
+      grupo: student.grupo ?? '',
+      activo: Boolean(student.activo)
+    });
+    setFormData({
+      cedula: student.cedula ?? '',
+      nombre: student.nombre ?? '',
+      apellido: student.apellido ?? '',
+      segundoApellido: student.segundoApellido ?? '',
+      edad: student.edad ?? '',
+      encargado: student.encargado ?? '',
+      telefonoEncargado: student.telefonoEncargado ?? '',
+      observaciones: student.observaciones ?? '',
+      grupo: student.grupo ?? '',
+      activo: Boolean(student.activo)
+    });
+
     setEditingId(student.id);
     setShowForm(true);
   };
+
 
   const handleDeleteStudent = (id) => {
     setDeleteConfirm(id);
   };
 
-  const confirmDeleteStudent = (id) => {
-    setStudents(students.filter(s => s.id !== id));
-    setDeleteConfirm(null);
+  const confirmDeleteStudent = async (id) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      await studentService.deleteStudent(id);
+      await fetchStudents();
+
+      setDeleteConfirm(null);
+    } catch (err) {
+      setError(err.message || 'Error eliminando estudiante');
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   const handleCancel = () => {
     setShowForm(false);
     setEditingId(null);
     setFormData({
+      cedula: '',
       nombre: '',
       apellido: '',
       segundoApellido: '',
@@ -214,6 +392,7 @@ const StudentManagement = () => {
             } else {
               setEditingId(null);
               setFormData({
+                cedula: '',
                 nombre: '',
                 apellido: '',
                 segundoApellido: '',
@@ -258,8 +437,20 @@ const StudentManagement = () => {
         <div className="form-container">
           <h3 className="form-title">{editingId ? 'Editar Estudiante' : 'Nuevo Estudiante'}</h3>
           <form className="student-form">
+            {formError && <div className="form-error">{formError}</div>}
             <div className="form-row">
               <div className="form-group">
+                <label>Cédula *</label>
+                <input
+                  type="text"
+                  value={formData.cedula}
+                  onChange={(e) =>
+                    setFormData({ ...formData, cedula: e.target.value })
+                  }
+                  placeholder="123456789"
+                  required
+                  disabled={!!editingId}
+                />
                 <label>Nombre *</label>
                 <input
                   type="text"
@@ -354,7 +545,7 @@ const StudentManagement = () => {
                   name="telefonoEncargado"
                   value={formData.telefonoEncargado}
                   onChange={handleInputChange}
-                  placeholder="+506 XXXX XXXX"
+                  placeholder="88888888"
                   required
                 />
               </div>
