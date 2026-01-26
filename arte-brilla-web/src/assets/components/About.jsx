@@ -1,5 +1,9 @@
 import React from 'react';
 import '../styles/About.css';
+import yethsiraImg from '../images/Yethsira.jpg';
+import anebyImg from '../images/Aneby.jpg';
+import yeilynImg from '../images/Yeilyn.jpg';
+import natalieImg from '../images/Natalie.jpg';
 
 export default function About() {
   return (
@@ -166,25 +170,25 @@ export default function About() {
           <p className="instructors-subtitle">Liderazgo apasionado con vocación de servicio y amor por el arte</p>
           <div className="instructors-grid" style={{justifyContent: 'center'}}>
             <div className="instructor-card" style={{maxWidth: '400px'}}>
-              <div className="instructor-avatar">👩‍🏫</div>
+              <img className="instructor-avatar" src={yethsiraImg} alt="Licda. Yethsira Wilson Cash" />
               <h4 className="instructor-name">Licda. Yethsira Wilson Cash</h4>
               <p className="instructor-specialty">Directora General</p>
               <p className="instructor-bio">Con 13 años de trayectoria, es una líder apasionada por el arte y el impacto social. Ha transformado Arte Brilla en un espacio seguro, creativo y formativo que ilumina la comunidad de Limón.</p>
             </div>
             <div className="instructor-card">
-              <div className="instructor-avatar">👩‍🏫</div>
+              <img className="instructor-avatar" src={anebyImg} alt="Aneby Sandi Hernández" />
               <h4 className="instructor-name">Aneby Sandi Hernández</h4>
               <p className="instructor-specialty">Docente</p>
               <p className="instructor-bio">Aneby Sandi Hernández es educadora y formadora artística, con una profunda vocación por el movimiento y la enseñanza. Como profesora de Educación Física, integra la danza y el arte del movimiento con bases pedagógicas sólidas, promoviendo la expresión y el crecimiento integral. Forma parte activa del proyecto Arte Brilla, donde acompaña procesos artísticos con niñas y jóvenes, creando espacios seguros que fortalecen la confianza, la identidad y el desarrollo humano a través de la danza.</p>
             </div>
             <div className="instructor-card">
-              <div className="instructor-avatar">👩‍🏫</div>
-              <h4 className="instructor-name">Jeilyn Arley Zúñiga</h4>
+              <img className="instructor-avatar" src={yeilynImg} alt="Jeilyn Arley Zúñiga" />
+              <h4 className="instructor-name">Yeilyn Arley Zúñiga</h4>
               <p className="instructor-specialty">Docente</p>
               <p className="instructor-bio">Yeilyn Monique Arley Zúñiga es una joven de 16 años, estudiante colegial y miembro del staff de Arte Brilla desde hace más de un año. Se destaca por su interés, sensibilidad y dedicación en la enseñanza de niñas en edades tempranas (3 a 6 años). Posee afinidad por la danza y diversas técnicas artísticas. Actualmente se desempeña como maestra del grupo “Arte Brilla Babys”, labor que realiza en conjunto con las maestras de equipo. Se caracteriza por ser responsable, comprometida y con una actitud llena de amor, alegría y vocación de servicio.</p>
             </div>
             <div className="instructor-card">
-              <div className="instructor-avatar">👩‍🏫</div>
+              <img className="instructor-avatar" src={natalieImg} alt="Natalie Hernández Monterosa" />
               <h4 className="instructor-name">Natalie Hernández Monterosa</h4>
               <p className="instructor-specialty">Docente</p>
               <p className="instructor-bio">Natalie es administradora y abogada de profesión. Inició su trayectoria hace aproximadamente 10 años como integrante del equipo de danza, experiencia que marcó el inicio de su compromiso con la formación artística y humana. Actualmente se desempeña como docente y coordinadora de niñas entre 5 y 8 años, rol que ha ejercido desde los inicios del proyecto Arte Brilla (Equipo Arte Brilla Baby). Su labor se distingue por la dedicación, el acompañamiento cercano y el amor con el que guía a las más pequeñas, promoviendo un ambiente de aprendizaje, confianza y expresión artística.</p>
