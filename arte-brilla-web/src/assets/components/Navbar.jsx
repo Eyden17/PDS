@@ -32,14 +32,7 @@ const Navbar = () => {
       <div className="navbar-container">
         {/* Logo de la Academia */}
         <Link to="/" className="logo-wrapper" onClick={() => setIsMenuOpen(false)}>
-          <div className="logo-text-wrapper">
-            <span className="arte-text">ARTE</span>
-            <div className="brilla-container">
-              <span className="brilla-text">Brilla</span>
-              <div className="brilla-underline"></div>
-            </div>
-            <span className="logo-subtitle">DANCE STUDIO</span>
-          </div>
+          <img src={logo} alt="Arte Brilla" className="logo-image" />
         </Link>
 
         {/* Botón hamburguesa */}
