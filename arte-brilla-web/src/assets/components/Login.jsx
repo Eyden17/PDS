@@ -19,13 +19,10 @@ const Login = () => {
     const result = await login(email, password);
 
     if (result.success) {
-      // BD: OWNER/ADMIN -> admin panel, TEACHER -> teacher panel
-      // Yo recomendaria cambiar /admin a /dashboard o similar
-      if (result.role === 'OWNER' || result.role === 'ADMIN') navigate('/admin');
-      else if (result.role === 'TEACHER') navigate('/teacher');
-      else setError('Rol no reconocido');
+      const destination = (result.role === 'OWNER' || result.role === 'ADMIN') ? '/admin' : '/teacher';
+      navigate(destination, { replace: true });
     } else {
-      setError(result.message || 'Credenciales inválidas');
+      setError(result.message || 'Credenciales inválidas o error de conexión');
       setPassword('');
     }
 
