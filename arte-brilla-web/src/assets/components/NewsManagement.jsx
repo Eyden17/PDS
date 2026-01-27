@@ -21,25 +21,25 @@ const NewsManagement = () => {
     descripcionCorta: '',
     contenido: '',
     imagenPreview: null,
-    categoria: 'Anuncio',
+    categoria: 'anuncio',
     autor: 'Admin',
     activa: true
   });
 
-  const categorias = ['ANUNCIO', 'RECITAL', 'PRESENTACIÓN', 'TALLER', 'OTRO'];
+  const categorias = ['anuncio', 'recital', 'presentación', 'taller', 'otro'];
   const colorCategoria = {
-    'ANUNCIO': '#3498db',
-    'RECITAL': '#e74c3c',
-    'PRESENTACIÓN': '#f39c12',
-    'TALLER': '#9b59b6',
-    'OTRO': '#34495e'
+    'anuncio': '#3498db',
+    'recital': '#e74c3c',
+    'presentación': '#f39c12',
+    'taller': '#9b59b6',
+    'otro': '#34495e'
   };
   const iconoCategoria = {
-    'ANUNCIO': '📢',
-    'RECITA': '🎉',
-    'PRESENTACIÓN': '🏆',
-    'TALLER': '📚',
-    'OTRO': '📚'
+    'anuncio': '📢',
+    'recital': '🎉',
+    'presentación': '🏆',
+    'taller': '📚',
+    'otro': '📚'
   };
 
   const handleInputChange = (e) => {
