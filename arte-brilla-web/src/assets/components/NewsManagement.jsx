@@ -1,4 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { newsService } from '../../services/newsService';
+import { mediaService } from '../../services/mediaService';
 import '../styles/NewsManagement.css';
 
 const NewsManagement = () => {
@@ -13,6 +15,7 @@ const NewsManagement = () => {
   const [deleteModal, setDeleteModal] = useState(null);
   const [filterCategoria, setFilterCategoria] = useState('Todas');
   const [filterBusqueda, setFilterBusqueda] = useState('');
+  const [imageFile, setImageFile] = useState(null);
   const [formData, setFormData] = useState({
     titulo: '',
     descripcionCorta: '',
@@ -23,18 +26,20 @@ const NewsManagement = () => {
     activa: true
   });
 
-  const categorias = ['Anuncio', 'Evento', 'Competencia', 'Workshop'];
+  const categorias = ['ANUNCIO', 'RECITAL', 'PRESENTACIÓN', 'TALLER', 'OTRO'];
   const colorCategoria = {
-    'Anuncio': '#3498db',
-    'Evento': '#e74c3c',
-    'Competencia': '#f39c12',
-    'Workshop': '#9b59b6'
+    'ANUNCIO': '#3498db',
+    'RECITAL': '#e74c3c',
+    'PRESENTACIÓN': '#f39c12',
+    'TALLER': '#9b59b6',
+    'OTRO': '#34495e'
   };
   const iconoCategoria = {
-    'Anuncio': '📢',
-    'Evento': '🎉',
-    'Competencia': '🏆',
-    'Workshop': '📚'
+    'ANUNCIO': '📢',
+    'RECITA': '🎉',
+    'PRESENTACIÓN': '🏆',
+    'TALLER': '📚',
+    'OTRO': '📚'
   };
 
   const handleInputChange = (e) => {
@@ -47,42 +52,58 @@ const NewsManagement = () => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({
-          ...prev,
-          imagenPreview: reader.result
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+
+    setImageFile(file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData(prev => ({
+        ...prev,
+        imagenPreview: reader.result
+      }));
+    };
+    reader.readAsDataURL(file);
   };
 
-  const handleAddNews = () => {
-    if (!formData.titulo.trim() || !formData.descripcionCorta.trim() || !formData.contenido.trim()) {
-      alert('Por favor completa todos los campos obligatorios');
+  const handleAddNews = async () => {
+    if (!formData.titulo || !formData.contenido) {
+      alert('Campos obligatorios');
       return;
     }
 
-    if (editingId) {
-      setNews(news.map(n =>
-        n.id === editingId
-          ? { ...formData, id: editingId, fechaCreacion: n.fechaCreacion }
-          : n
-      ));
-    } else {
-      const newNews = {
-        ...formData,
-        id: Date.now(),
-        fechaCreacion: new Date()
-      };
-      setNews([newNews, ...news]);
-    }
+    try {
+      let coverMediaId = null;
 
-    resetForm();
-    setShowForm(false);
+      if (imageFile) {
+        const media = await mediaService.uploadImage(imageFile, {
+          section: 'news',
+          title: formData.titulo
+        });
+        coverMediaId = media.id;
+      }
+
+      const payload = {
+        title: formData.titulo,
+        category: formData.categoria,
+        content: formData.contenido,
+        cover_media_id: coverMediaId,
+        is_published: formData.activa
+      };
+
+      if (editingId) {
+        await newsService.updateNews(editingId, payload);
+      } else {
+        await newsService.createNews(payload);
+      }
+
+      resetForm();
+      setShowForm(false);
+    } catch (err) {
+      alert(err.message || 'Error al guardar');
+    }
   };
+
 
   const resetForm = () => {
     setFormData({
@@ -107,9 +128,18 @@ const NewsManagement = () => {
     setDeleteModal(newsItem);
   };
 
-  const confirmarDelete = () => {
-    setNews(news.filter(n => n.id !== deleteModal.id));
-    setDeleteModal(null);
+  const confirmarDelete = async () => {
+    try {
+      await newsService.deleteNews(deleteModal.id);
+
+      setNews(prev =>
+        prev.filter(n => n.id !== deleteModal.id)
+      );
+
+      setDeleteModal(null);
+    } catch (err) {
+      alert(err.message || 'Error al eliminar la noticia');
+    }
   };
 
   const handleCancel = () => {
@@ -256,7 +286,7 @@ const NewsManagement = () => {
                   required
                 >
                   {categorias.map(cat => (
-                    <option key={cat} value={cat}>{iconoCategoria[cat]} {cat}</option>
+                    <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </select>
               </div>
