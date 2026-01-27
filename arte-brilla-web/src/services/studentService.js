@@ -1,44 +1,6 @@
-
+// src/services/studentService.js
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-function getAccessToken() {
-  const raw = localStorage.getItem('ab_session');
-  const session = raw ? JSON.parse(raw) : null;
-  return session?.accessToken || null;
-}
-
-function buildUrl(path) {
-  const base = API_BASE.replace(/\/+$/, '');
-  const p = path.startsWith('/') ? path : `/${path}`;
-  return `${base}${p}`;
-}
-
-async function apiFetch(path, options = {}) {
-  const token = getAccessToken();
-
-  const headers = {
-    ...(options.headers || {}),
-    ...(token ? { Authorization: `Bearer ${token}` } : {})
-  };
-
-  const res = await fetch(buildUrl(path), { ...options, headers });
-
-  if (res.status === 401) {
-    localStorage.removeItem('ab_session');
-    window.location.href = '/login';
-    return;
-  }
-
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const apiError = new Error(body?.error || body?.message || 'Error en API');
-    apiError.code = body?.code;
-    apiError.details = body?.details;
-    throw apiError;
-  }
-
-  return body;
-}
+import { apiFetch } from './api.js';
 
 export const studentService = {
   // GET /api/students?...
@@ -53,6 +15,7 @@ export const studentService = {
   },
 
   createStudent: async (studentData) => {
+    // POST /api/students
     return apiFetch('/api/students', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -61,6 +24,7 @@ export const studentService = {
   },
 
   updateStudent: async (id, studentData) => {
+    // PUT /api/students/:id
     return apiFetch(`/api/students/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -69,6 +33,7 @@ export const studentService = {
   },
 
   deleteStudent: async (id) => {
+    // DELETE /api/students/:id
     return apiFetch(`/api/students/${id}`, { method: 'DELETE' });
   }
 };

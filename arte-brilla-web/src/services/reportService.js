@@ -1,42 +1,6 @@
 // src/services/reportService.js
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-function getAccessToken() {
-  const raw = localStorage.getItem('ab_session');
-  const session = raw ? JSON.parse(raw) : null;
-  return session?.accessToken || null;
-}
-
-function buildUrl(path) {
-  const base = API_BASE.replace(/\/+$/, '');
-  const p = path.startsWith('/') ? path : `/${path}`;
-  return `${base}${p}`;
-}
-
-async function apiFetch(path, options = {}) {
-  const token = getAccessToken();
-
-  const headers = {
-    ...(options.headers || {}),
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-
-  const res = await fetch(buildUrl(path), { ...options, headers });
-
-  if (res.status === 401) {
-    localStorage.removeItem('ab_session');
-    window.location.href = '/login';
-    return;
-  }
-
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const msg = body?.error || body?.message || 'Error en API';
-    throw new Error(msg);
-  }
-
-  return body; // backend devuelve array directo
-}
+import { apiFetch } from './api.js';
 
 export const reportService = {
   // GET /api/reports/cobranza?year=YYYY&month=MM&group=Babies&only_debtors=false
