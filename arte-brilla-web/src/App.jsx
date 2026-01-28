@@ -19,6 +19,7 @@ import Login from './assets/components/Login';
 import AdminPanel from './assets/components/AdminPanel';
 import ProtectedRoute from './assets/components/ProtectedRoute';
 import NotFound from './assets/components/NotFound';
+import NewsDetail from './assets/components/NewsDetail';
 import './assets/styles/App.css'
 
 function App() {
@@ -43,6 +44,8 @@ function App() {
               <Route path="/classes" element={<Classes />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/news/:id" element={<NewsDetail />} />
+
               {/* <Route path="/forgot-password" element={<ForgotPassword />} /> */}
               <Route
                 path="/admin"

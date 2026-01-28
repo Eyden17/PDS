@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { newsService } from '../../services/newsService';
 import '../styles/NewsGallery.css';
 
 const CameraIcon = () => (
@@ -9,39 +10,171 @@ const CameraIcon = () => (
   </svg>
 );
 
+// Paleta para placeholders de color cuando no hay imagen
+const FALLBACKS = [
+  ['#667eea', '#764ba2'],
+  ['#f093fb', '#f5576c'],
+  ['#4facfe', '#00f2fe'],
+  ['#43e97b', '#38f9d7'],
+  ['#fa709a', '#fee140'],
+  ['#30cfd0', '#330867'],
+];
+
+function hashToIndex(str) {
+  const s = String(str || '');
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h % FALLBACKS.length;
+}
+
+function getGradientStyle(id) {
+  const [a, b] = FALLBACKS[hashToIndex(id)];
+  return { background: `linear-gradient(135deg, ${a}, ${b})` };
+}
+
+function mapDbNewsToCard(n) {
+  const title = n.title ?? '';
+  const content = n.content ?? '';
+  const short = n.short_description ?? (content ? String(content).slice(0, 140) : '');
+  const image = n.cover_url ?? n.cover_media_url ?? null;
+
+  return {
+    id: n.id,
+    title,
+    image,
+    excerpt: short,
+  };
+}
+
+const SkeletonFeatured = () => (
+  <div className="news-featured">
+    <article className="featured-card sample">
+      <div className="featured-media">
+        <div className="skeleton skeleton-media skeleton-featured" />
+      </div>
+      <div className="news-card-body">
+        <div className="skeleton skeleton-line skeleton-title" />
+        <div className="skeleton skeleton-line" />
+        <div className="skeleton skeleton-line skeleton-short" />
+        <div className="skeleton skeleton-btn" />
+      </div>
+    </article>
+
+    <div className="featured-list">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <article key={i} className="news-card small sample">
+          <div className="card-media">
+            <div className="skeleton skeleton-media skeleton-small" />
+          </div>
+          <div className="news-card-body">
+            <div className="skeleton skeleton-line skeleton-title-sm" />
+            <div className="skeleton skeleton-btn-sm" />
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+);
+
+const MediaBlock = ({ item, large = false }) => {
+  // Si hay imagen, render img
+  if (item.image) {
+    return (
+      <img
+        src={item.image}
+        alt={item.title}
+        loading="lazy"
+        onError={(e) => {
+          // Si falla la URL, ocultamos imagen y dejamos el placeholder por CSS/markup
+          e.currentTarget.style.display = 'none';
+          const parent = e.currentTarget.parentElement;
+          if (parent) parent.setAttribute('data-noimg', 'true');
+        }}
+      />
+    );
+  }
+
+  // Si NO hay imagen, placeholder con gradiente + ícono
+  return (
+    <div
+      className={`news-noimage ${large ? 'large' : 'small'}`}
+      style={getGradientStyle(item.id)}
+      aria-label="Noticia sin imagen"
+    >
+      <div className="news-noimage-inner">
+        <CameraIcon />
+        <span>Sin imagen</span>
+      </div>
+    </div>
+  );
+};
+
 const NewsGallery = ({ articles = null } = {}) => {
-  // Not hooked to an API yet. Use passed articles if available, otherwise fallback to a sample demo item so the section is visible.
-  const newsItems = Array.isArray(articles) ? articles : [];
+  const [apiNews, setApiNews] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const sample = [
-    {
-      id: 'demo-1',
-      title: 'Noticia de Prueba: Gran Gala de Danza',
-      image: 'https://picsum.photos/seed/news-demo/1200/800',
-      excerpt: 'Esta es una noticia de demostración para que puedas ver cómo quedaría la sección de noticias en la página de inicio.'
-    },
-    {
-      id: 'demo-2',
-      title: 'Clases Abiertas: Trae a un Amigo',
-      image: 'https://picsum.photos/seed/news-2/1200/800',
-      excerpt: 'Este sábado abrimos nuestras puertas para que pruebes una clase gratis en familia o con amigos.'
-    },
-    {
-      id: 'demo-3',
-      title: 'Inscripciones de Verano',
-      image: 'https://picsum.photos/seed/news-3/1200/800',
-      excerpt: 'Abiertas las inscripciones para los cursos intensivos de verano, cupos limitados.'
-    },
-    {
-      id: 'demo-4',
-      title: 'Historias de Alumnos',
-      image: 'https://picsum.photos/seed/news-4/1200/800',
-      excerpt: 'Conoce a nuestros alumnos destacados y sus progresos en la academia.'
-    }
-  ];
+  // Si te pasan articles, NO pegamos al API
+  const usePassed = Array.isArray(articles);
 
-  const itemsToShow = newsItems.length ? newsItems : sample;
-  const isSample = newsItems.length === 0;
+  useEffect(() => {
+    if (usePassed) return;
+
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await newsService.list();
+        const rows = res?.data ?? res ?? [];
+        const mapped = rows.map(mapDbNewsToCard);
+        if (mounted) setApiNews(mapped);
+      } catch {
+        if (mounted) setApiNews([]);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+
+    return () => { mounted = false; };
+  }, [usePassed]);
+
+  const newsItems = useMemo(() => {
+    if (usePassed) return Array.isArray(articles) ? articles : [];
+    return apiNews;
+  }, [usePassed, articles, apiNews]);
+
+  // ✅ Skeleton solo cuando viene del API y está cargando
+  if (!usePassed && loading) {
+    return (
+      <section className="news-gallery">
+        <div className="container">
+          <div className="section-header">
+            <h2>Noticias</h2>
+          </div>
+          <SkeletonFeatured />
+        </div>
+      </section>
+    );
+  }
+
+  // ✅ Si ya cargó y no hay nada
+  if (!newsItems.length) {
+    return (
+      <section className="news-gallery">
+        <div className="container">
+          <div className="section-header">
+            <h2>Noticias</h2>
+            <p className="muted">Últimas actualizaciones e imágenes de la academia</p>
+          </div>
+
+          <div className="news-empty">
+            <div className="news-empty-icon"><CameraIcon /></div>
+            <h3>No hay noticias aún</h3>
+            <p className="muted">Cuando publiques una noticia, aparecerá aquí automáticamente.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="news-gallery">
@@ -51,31 +184,25 @@ const NewsGallery = ({ articles = null } = {}) => {
           <p className="muted">Últimas actualizaciones e imágenes de la academia</p>
         </div>
 
-        {itemsToShow.length > 1 ? (
+        {newsItems.length > 1 ? (
           <div className="news-featured">
-            <article className={`featured-card ${isSample ? 'sample' : ''}`}>
-              <img
-                src={itemsToShow[0].image}
-                alt={itemsToShow[0].title}
-                loading="lazy"
-                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://via.placeholder.com/1200x800?text=Imagen+no+disponible'; }}
-              />
+            <article className="featured-card">
+              <div className="featured-media">
+                <MediaBlock item={newsItems[0]} large />
+              </div>
               <div className="news-card-body">
-                <h3>{itemsToShow[0].title}</h3>
-                {itemsToShow[0].excerpt && <p className="muted excerpt">{itemsToShow[0].excerpt}</p>}
-                <Link to={`/news/${itemsToShow[0].id}`} className="read-more">Leer</Link>
+                <h3>{newsItems[0].title}</h3>
+                {newsItems[0].excerpt && <p className="muted excerpt">{newsItems[0].excerpt}</p>}
+                <Link to={`/news/${newsItems[0].id}`} className="read-more">Leer</Link>
               </div>
             </article>
 
             <div className="featured-list">
-              {itemsToShow.slice(1).map(item => (
-                <article key={item.id} className={`news-card small ${isSample ? 'sample' : ''}`}>
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    loading="lazy"
-                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://via.placeholder.com/400x300?text=Imagen+no+disponible'; }}
-                  />
+              {newsItems.slice(1).map(item => (
+                <article key={item.id} className="news-card small">
+                  <div className="card-media">
+                    <MediaBlock item={item} />
+                  </div>
                   <div className="news-card-body">
                     <h4>{item.title}</h4>
                     <Link to={`/news/${item.id}`} className="read-more">Leer</Link>
@@ -86,14 +213,11 @@ const NewsGallery = ({ articles = null } = {}) => {
           </div>
         ) : (
           <div className="news-grid">
-            {itemsToShow.map(item => (
-              <article key={item.id} className={`news-card ${isSample ? 'sample' : ''}`}>
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  loading="lazy"
-                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://via.placeholder.com/1200x800?text=Imagen+no+disponible'; }}
-                />
+            {newsItems.map(item => (
+              <article key={item.id} className="news-card">
+                <div className="card-media">
+                  <MediaBlock item={item} large />
+                </div>
                 <div className="news-card-body">
                   <h3>{item.title}</h3>
                   {item.excerpt && <p className="muted excerpt">{item.excerpt}</p>}

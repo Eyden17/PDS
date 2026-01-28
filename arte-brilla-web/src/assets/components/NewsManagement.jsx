@@ -4,43 +4,121 @@ import { mediaService } from '../../services/mediaService';
 import '../styles/NewsManagement.css';
 
 const NewsManagement = () => {
-  const [news, setNews] = useState([
-    { id: 1, titulo: 'Inauguración de nuevo aula de danza', descripcionCorta: 'Se ha inaugurado con éxito el nuevo aula de danza moderna con espejos de alta calidad', contenido: 'Nos complace anunciar la inauguración de nuestro nuevo aula de danza equipada con espejos de piso a techo, sistema de sonido profesional y piso especial para danza.', imagenPreview: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23667eea" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" font-size="24" fill="white" text-anchor="middle" dominant-baseline="middle" font-family="Arial"%3EEvento: Inauguración%3C/text%3E%3C/svg%3E', categoria: 'Evento', autor: 'Dirección', fechaCreacion: new Date('2025-12-20'), activa: true },
-    { id: 2, titulo: 'Competencia anual de danzas 2025', descripcionCorta: 'Todos nuestros estudiantes están invitados a participar en este evento destacado', contenido: 'La competencia anual de danzas es uno de nuestros eventos más esperados. Este año tendremos categorías para todos los niveles de dificultad y grupos de edad.', imagenPreview: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%23f39c12" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" font-size="24" fill="white" text-anchor="middle" dominant-baseline="middle" font-family="Arial"%3ECompetencia 2025%3C/text%3E%3C/svg%3E', categoria: 'Competencia', autor: 'Coordinador', fechaCreacion: new Date('2025-12-15'), activa: true },
-    { id: 3, titulo: 'Cambios en horarios de clases', descripcionCorta: 'A partir del próximo mes habrá cambios en los horarios de todas las clases', contenido: 'Por favor revisar los nuevos horarios que entrarán en vigor a partir del 1 de enero de 2026. Los cambios se deben a la incorporación de nuevos horarios de turnos.', imagenPreview: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%233498db" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" font-size="24" fill="white" text-anchor="middle" dominant-baseline="middle" font-family="Arial"%3ECambios Horarios%3C/text%3E%3C/svg%3E', categoria: 'Anuncio', autor: 'Admin', fechaCreacion: new Date('2025-12-10'), activa: true },
-    { id: 4, titulo: 'Masterclass con instructor internacional', descripcionCorta: 'Tendremos una masterclass especial con un instructor reconocido internacionalmente', contenido: 'No te pierdas esta oportunidad única de aprender técnicas avanzadas de un maestro internacional con más de 20 años de experiencia en danza contemporánea.', imagenPreview: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect fill="%239b59b6" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" font-size="24" fill="white" text-anchor="middle" dominant-baseline="middle" font-family="Arial"%3EMasterclass%3C/text%3E%3C/svg%3E', categoria: 'Workshop', autor: 'Instructor', fechaCreacion: new Date('2025-12-05'), activa: false },
-  ]);
+  const [news, setNews] = useState([]); // ✅ ahora viene del API
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [deleteModal, setDeleteModal] = useState(null);
   const [filterCategoria, setFilterCategoria] = useState('Todas');
   const [filterBusqueda, setFilterBusqueda] = useState('');
   const [imageFile, setImageFile] = useState(null);
+
   const [formData, setFormData] = useState({
     titulo: '',
     descripcionCorta: '',
     contenido: '',
-    imagenPreview: null,
-    categoria: 'anuncio',
-    autor: 'Admin',
+    imagenPreview: null,      // preview en UI (base64 o url)
+    categoria: 'anuncio',     // UI usa lowercase
+    autor: 'Admin',           // solo UI
     activa: true
   });
 
-  const categorias = ['anuncio', 'recital', 'presentación', 'taller', 'otro'];
+  const categorias = ['ANUNCIO', 'RECITAL', 'PRESENTACIÓN', 'TALLER', 'OTRO'];
+
   const colorCategoria = {
-    'anuncio': '#3498db',
-    'recital': '#e74c3c',
-    'presentación': '#f39c12',
-    'taller': '#9b59b6',
-    'otro': '#34495e'
+    anuncio: '#3498db',
+    recital: '#e74c3c',
+    presentación: '#f39c12',
+    taller: '#9b59b6',
+    otro: '#34495e'
   };
+
   const iconoCategoria = {
-    'anuncio': '📢',
-    'recital': '🎉',
-    'presentación': '🏆',
-    'taller': '📚',
-    'otro': '📚'
+    anuncio: '📢',
+    recital: '🎉',
+    presentación: '🏆',
+    taller: '📚',
+    otro: '📚'
   };
+
+  // =========================
+  // Helpers: categoría UI <-> DB
+  // DB (según tu schema): 'ANUNCIO','RECITAL','PRESENTACIÓN','TALLER','OTRO'
+  // =========================
+  const toDbCategory = (uiCat) => {
+    const c = (uiCat || '').toLowerCase();
+    if (c === 'anuncio') return 'ANUNCIO';
+    if (c === 'recital') return 'RECITAL';
+    if (c === 'presentación' || c === 'presentacion') return 'PRESENTACIÓN';
+    if (c === 'taller') return 'TALLER';
+    return 'OTRO';
+  };
+
+  const fromDbCategory = (dbCat) => {
+    const c = (dbCat || '').toUpperCase();
+    if (c === 'ANUNCIO') return 'ANUNCIO';
+    if (c === 'RECITAL') return 'RECITAL';
+    if (c === 'PRESENTACIÓN' || c === 'PRESENTACION') return 'PRESENTACIÓN';
+    if (c === 'TALLER') return 'TALLER';
+    return 'OTRO';
+  };
+
+  // =========================
+  // Cargar noticias desde API
+  // =========================
+  const fetchNews = async () => {
+    try {
+      setLoading(true);
+      setError('');
+
+      const res = await newsService.list();
+      const rows = res?.data ?? res ?? [];
+
+      const mapped = rows.map((n) => {
+        const catUpper = (n.category ?? 'OTRO').toUpperCase();
+
+        // DB->UI (lowercase)
+        const catLower =
+          catUpper === 'ANUNCIO' ? 'ANUNCIO' :
+          catUpper === 'RECITAL' ? 'RECITAL' :
+          (catUpper === 'PRESENTACIÓN' || catUpper === 'PRESENTACION') ? 'PRESENTACIÓN' :
+          catUpper === 'TALLER' ? 'TALLER' :
+          'OTRO';
+        return {
+          id: n.id,
+          titulo: n.title ?? '',
+          descripcionCorta: n.short_description ?? (n.content ? String(n.content).slice(0, 140) : ''),
+          contenido: n.content ?? '',
+
+          // ✅ AQUÍ estaba el problema (tu API manda cover_url)
+          imagenPreview: n.cover_url ?? n.cover_media_url ?? null,
+
+          cover_media_id: n.cover_media_id ?? null,
+
+          // ✅ categoría UI en minúsculas como tu diseño original
+          categoria: catLower,
+
+          autor: n.created_by_name ?? 'Admin',
+          fechaCreacion: n.created_at ?? new Date(),
+          activa: Boolean(n.is_published),
+        };
+      });
+
+      setNews(mapped);
+    } catch (e) {
+      setError(e.message || 'Error cargando noticias');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  useEffect(() => {
+    fetchNews();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -51,7 +129,7 @@ const NewsManagement = () => {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (!file) return;
 
     setImageFile(file);
@@ -66,63 +144,112 @@ const NewsManagement = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleAddNews = async () => {
-    if (!formData.titulo || !formData.contenido) {
-      alert('Campos obligatorios');
-      return;
-    }
-
-    try {
-      let coverMediaId = null;
-
-      if (imageFile) {
-        const media = await mediaService.uploadImage(imageFile, {
-          section: 'news',
-          title: formData.titulo
-        });
-        coverMediaId = media.id;
-      }
-
-      const payload = {
-        title: formData.titulo,
-        category: formData.categoria,
-        content: formData.contenido,
-        cover_media_id: coverMediaId,
-        is_published: formData.activa
-      };
-
-      if (editingId) {
-        await newsService.updateNews(editingId, payload);
-      } else {
-        await newsService.createNews(payload);
-      }
-
-      resetForm();
-      setShowForm(false);
-    } catch (err) {
-      alert(err.message || 'Error al guardar');
-    }
-  };
-
-
   const resetForm = () => {
     setFormData({
       titulo: '',
       descripcionCorta: '',
       contenido: '',
       imagenPreview: null,
-      categoria: 'Anuncio',
+      categoria: 'anuncio',
       autor: 'Admin',
       activa: true
     });
     setEditingId(null);
+    setImageFile(null);
   };
 
+  // =========================
+  // Crear / Editar (API)
+  // =========================
+  const handleAddNews = async () => {
+    if (!formData.titulo?.trim() || !formData.contenido?.trim()) {
+      alert('Campos obligatorios');
+      return;
+    }
+
+    try {
+      let coverMediaId = null;
+      let oldCoverId = null;
+
+      // si estoy editando, tomo el cover actual (puede ser null)
+      if (editingId) {
+        const current = news.find(n => n.id === editingId);
+        oldCoverId = current?.cover_media_id ?? null;
+        coverMediaId = oldCoverId;
+      }
+
+      // ✅ Caso: el usuario quitó la imagen (dejó preview null) y NO subió una nueva
+      const wantsRemoveCover =
+        Boolean(editingId) && !imageFile && formData.imagenPreview === null;
+
+      if (wantsRemoveCover) {
+        coverMediaId = null; // se elimina el cover en la noticia
+        if (oldCoverId) {
+          try {
+            await mediaService.deleteMedia(oldCoverId);
+          } catch (e) {
+            // si ya no existía en storage/BD, no rompas la edición
+            console.warn('No se pudo borrar media vieja (ignorado):', e?.message || e);
+          }
+        }
+      }
+
+      // ✅ Caso: el usuario seleccionó una imagen nueva
+      if (imageFile) {
+        const media = await mediaService.uploadImage(imageFile, {
+          section: 'news',
+          title: formData.titulo
+        });
+
+        coverMediaId = media?.id ?? null;
+
+        // borrar anterior solo si había
+        if (oldCoverId) {
+          try {
+            await mediaService.deleteMedia(oldCoverId);
+          } catch (e) {
+            console.warn('No se pudo borrar media vieja (ignorado):', e?.message || e);
+          }
+        }
+      }
+
+      const payload = {
+        title: formData.titulo.trim(),
+        category: String(formData.categoria || 'ANUNCIO').toUpperCase(),
+        content: formData.contenido.trim(),
+        cover_media_id: coverMediaId, // puede ser null
+        is_published: Boolean(formData.activa),
+        // si tu API soporta short_description, mándalo:
+        // short_description: formData.descripcionCorta?.trim() || null,
+      };
+
+      if (editingId) {
+        await newsService.update(editingId, payload);
+      } else {
+        await newsService.create(payload);
+      }
+
+      resetForm();
+      setShowForm(false);
+      await fetchNews();
+    } catch (err) {
+      alert(err.message || 'Error al guardar');
+    }
+  };
+
+
+
   const handleEditNews = (newsItem) => {
-    setFormData(newsItem);
+    setImageFile(null); // para que no re-subas si no cambian imagen
+    setFormData({
+      ...newsItem,
+      // asegurá que el select use el valor correcto
+      categoria: (newsItem.categoria ?? 'anuncio').toLowerCase(),
+    });
     setEditingId(newsItem.id);
     setShowForm(true);
   };
+
 
   const handleDeleteNews = (newsItem) => {
     setDeleteModal(newsItem);
@@ -130,17 +257,21 @@ const NewsManagement = () => {
 
   const confirmarDelete = async () => {
     try {
-      await newsService.deleteNews(deleteModal.id);
+      // borrar noticia
+      await newsService.remove(deleteModal.id);
 
-      setNews(prev =>
-        prev.filter(n => n.id !== deleteModal.id)
-      );
+      // opcional: borrar media asociada
+      if (deleteModal.cover_media_id) {
+        await mediaService.deleteMedia(deleteModal.cover_media_id);
+      }
 
       setDeleteModal(null);
+      await fetchNews();
     } catch (err) {
       alert(err.message || 'Error al eliminar la noticia');
     }
   };
+
 
   const handleCancel = () => {
     setShowForm(false);
@@ -154,8 +285,12 @@ const NewsManagement = () => {
   const noticiasFiltradas = useMemo(() => {
     return news.filter(n => {
       const matchCategoria = filterCategoria === 'Todas' || n.categoria === filterCategoria;
-      const matchBusqueda = n.titulo.toLowerCase().includes(filterBusqueda.toLowerCase()) ||
-                           n.descripcionCorta.toLowerCase().includes(filterBusqueda.toLowerCase());
+      const busq = (filterBusqueda || '').toLowerCase();
+
+      const matchBusqueda =
+        (n.titulo || '').toLowerCase().includes(busq) ||
+        (n.descripcionCorta || '').toLowerCase().includes(busq);
+
       return matchCategoria && matchBusqueda;
     });
   }, [news, filterCategoria, filterBusqueda]);
@@ -176,10 +311,23 @@ const NewsManagement = () => {
             resetForm();
             setShowForm(!showForm);
           }}
+          disabled={loading}
         >
           {showForm ? '✕ Cancelar' : '+ Crear Noticia'}
         </button>
       </div>
+
+      {/* Mensaje de error/cargando sin romper diseño */}
+      {error && (
+        <div className="empty-state">
+          <p>⚠️ {error}</p>
+        </div>
+      )}
+      {loading && (
+        <div className="empty-state">
+          <p>⏳ Cargando...</p>
+        </div>
+      )}
 
       {/* Estadísticas */}
       <div className="stats-section">
@@ -261,7 +409,7 @@ const NewsManagement = () => {
         <div className="form-container">
           <form className="news-form">
             <h3>{editingId ? 'Editar Noticia' : 'Nueva Noticia'}</h3>
-            
+
             <div className="form-row">
               <div className="form-group">
                 <label>Título *</label>
@@ -344,10 +492,11 @@ const NewsManagement = () => {
                     <button
                       type="button"
                       className="btn-remove-image"
-                      onClick={() => setFormData(prev => ({
-                        ...prev,
-                        imagenPreview: null
-                      }))}
+                      onClick={() => {
+                        // permite "cambiar" imagen
+                        setFormData(prev => ({ ...prev, imagenPreview: null }));
+                        setImageFile(null);
+                      }}
                     >
                       Cambiar imagen
                     </button>
@@ -389,6 +538,7 @@ const NewsManagement = () => {
                 type="button"
                 className="btn-submit"
                 onClick={handleAddNews}
+                disabled={loading}
               >
                 {editingId ? '💾 Actualizar' : '✓ Publicar'}
               </button>
@@ -396,6 +546,7 @@ const NewsManagement = () => {
                 type="button"
                 className="btn-cancel"
                 onClick={handleCancel}
+                disabled={loading}
               >
                 ✕ Cancelar
               </button>
@@ -419,7 +570,14 @@ const NewsManagement = () => {
             >
               {newsItem.imagenPreview && (
                 <div className="news-image">
-                  <img src={newsItem.imagenPreview} alt={newsItem.titulo} />
+<img
+  src={newsItem.imagenPreview}
+  alt={newsItem.titulo}
+  onError={(e) => {
+    console.error('No cargó la imagen:', newsItem.imagenPreview);
+    e.currentTarget.style.display = 'none';
+  }}
+/>
                   <span
                     className="category-badge"
                     style={{ backgroundColor: colorCategoria[newsItem.categoria] }}
@@ -448,6 +606,7 @@ const NewsManagement = () => {
                     className="btn-edit"
                     onClick={() => handleEditNews(newsItem)}
                     title="Editar"
+                    disabled={loading}
                   >
                     ✏️ Editar
                   </button>
@@ -455,6 +614,7 @@ const NewsManagement = () => {
                     className="btn-delete"
                     onClick={() => handleDeleteNews(newsItem)}
                     title="Eliminar"
+                    disabled={loading}
                   >
                     🗑️ Eliminar
                   </button>
@@ -496,12 +656,14 @@ const NewsManagement = () => {
               <button
                 className="btn-delete-cancel"
                 onClick={() => setDeleteModal(null)}
+                disabled={loading}
               >
                 ✕ Cancelar
               </button>
               <button
                 className="btn-delete-confirm"
                 onClick={confirmarDelete}
+                disabled={loading}
               >
                 ✓ Sí, Eliminar
               </button>
