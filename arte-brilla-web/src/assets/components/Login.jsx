@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
 import '../styles/Login.css';
 
@@ -73,6 +73,12 @@ const Login = () => {
           >
             {isLoading ? 'Verificando...' : 'Acceder'}
           </button>
+
+          <div className="forgot-password-container-login">
+            <Link to="/forgot-password" className="forgot-password-link-login">
+              ¿Se te olvidó la contraseña?
+            </Link>
+          </div>
         </form>
 
         <div className="login-footer">
