@@ -14,7 +14,6 @@ const ScreenSizeWarning = () => {
 
     // Solo mostrar advertencia en dispositivos no móviles
     if (isMobileDevice()) {
-      setShowWarning(false);
       return;
     }
 
