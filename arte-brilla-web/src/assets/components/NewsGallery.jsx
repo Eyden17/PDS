@@ -123,7 +123,7 @@ const NewsGallery = ({ articles = null } = {}) => {
     (async () => {
       try {
         setLoading(true);
-        const res = await newsService.list();
+        const res = await newsService.listPublic();
         const rows = res?.data ?? res ?? [];
         const mapped = rows.map(mapDbNewsToCard);
         if (mounted) setApiNews(mapped);
