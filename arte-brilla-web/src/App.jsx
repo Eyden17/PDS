@@ -7,7 +7,6 @@ import Hero from './assets/components/Hero';
 import NewsGallery from './assets/components/NewsGallery';
 import DanceAreas from './assets/components/DanceAreas';
 import Team from './assets/components/Team';
-import Events from './assets/components/Events';
 
 import ImportantInfo from './assets/components/ImportantInfo';
 import About from './assets/components/About';
@@ -34,9 +33,8 @@ function App() {
               <Route path="/" element={
                 <>
                   <Hero />
-                  <Events />
-                  <ImportantInfo />
                   <NewsGallery />
+                  <ImportantInfo />
                   <DanceAreas />
                 </>
               } />
