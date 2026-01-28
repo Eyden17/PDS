@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './assets/components/Navbar';
-//import ScreenSizeWarning from './assets/components/ScreenSizeWarning';
+import ScreenSizeWarning from './assets/components/ScreenSizeWarning.jsx';
 import Hero from './assets/components/Hero';
 import NewsGallery from './assets/components/NewsGallery';
 import DanceAreas from './assets/components/DanceAreas';
@@ -15,7 +15,7 @@ import Classes from './assets/components/Classes';
 import Contact from './assets/components/Contact';
 import Footer from './assets/components/Footer';
 import Login from './assets/components/Login';
-//import ForgotPassword from './assets/components/ForgotPassword';
+import ForgotPassword from './assets/components/ForgotPassword.jsx';
 import AdminPanel from './assets/components/AdminPanel';
 import ProtectedRoute from './assets/components/ProtectedRoute';
 import NotFound from './assets/components/NotFound';
@@ -27,7 +27,7 @@ function App() {
     <Router>
       <AuthProvider>
         <div className="app">
-          {/* <ScreenSizeWarning /> */}
+          <ScreenSizeWarning />
           <Navbar />
           <main className="main-content">
             <Routes>
@@ -45,8 +45,7 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/login" element={<Login />} />
               <Route path="/news/:id" element={<NewsDetail />} />
-
-              {/* <Route path="/forgot-password" element={<ForgotPassword />} /> */}
+              <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route
                 path="/admin"
                 element={
