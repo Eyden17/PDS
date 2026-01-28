@@ -26,7 +26,7 @@ function App() {
     <Router>
       <AuthProvider>
         <div className="app">
-          <ScreenSizeWarning />
+          {/* <ScreenSizeWarning /> */}
           <Navbar />
           <main className="main-content">
             <Routes>
@@ -43,7 +43,7 @@ function App() {
               <Route path="/classes" element={<Classes />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
+              {/* <Route path="/forgot-password" element={<ForgotPassword />} /> */}
               <Route
                 path="/admin"
                 element={
