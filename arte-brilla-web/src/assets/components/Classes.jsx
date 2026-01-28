@@ -71,7 +71,7 @@ function Classes() {
               <p className="empty-emoji">⏳</p>
               <h3>Pronto publicaremos los horarios de este equipo</h3>
               <p>Estamos ajustando la oferta. Escríbenos para más detalles o reserva tu interés.</p>
-              <button className="class-action-btn" style={{ backgroundColor: '#6b7280' }}>Contactar</button>
+              <button className="class-action-btn" style={{ backgroundColor: '#6b7280' }} onClick={() => { window.location.href = '/contact'; }}>Contactar</button>
             </div>
           ) : (
             <div className="classes-list">
@@ -134,7 +134,7 @@ function Classes() {
           <p>Contáctanos para más información o solicita una clase de prueba</p>
           <button
             className="cta-button"
-            onClick={() => { window.location.href = 'http://localhost:5173/contact'; }}
+            onClick={() => { window.location.href = '/contact'; }}
           >
             Contactar Ahora
           </button>
