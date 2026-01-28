@@ -73,11 +73,12 @@
   display: flex;
   justify-content: center;
   align-items: stretch;
+  height: auto;
 }
 
 .area-card {
-  max-width: 420px;
   width: 100%;
+  max-width: none;
 }
 
 .areas-footer {
@@ -111,7 +112,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 350px;
+  min-height: 420px;
 }
 
 .area-card::before {
