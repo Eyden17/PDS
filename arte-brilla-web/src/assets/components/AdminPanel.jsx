@@ -3,7 +3,6 @@ import StudentManagement from './StudentManagement';
 import PaymentManagement from './PaymentManagement';
 import NewsManagement from './NewsManagement';
 import ClassesManagement from './ClassesManagement';
-import CommunicationManagement from './CommunicationManagement';
 import ReportManagement from './ReportManagement';
 import '../styles/AdminPanel.css';
 
@@ -22,8 +21,6 @@ const AdminPanel = () => {
         return <NewsManagement />;
       case 'classes':
         return <ClassesManagement />;
-      case 'communication':
-        return <CommunicationManagement />;
       case 'reports':
         return <ReportManagement />;
       default:
@@ -78,19 +75,6 @@ const AdminPanel = () => {
                 onClick={() => setActiveSection('classes')}
               >
                 Ir a Clases
-              </button>
-            </div>
-
-            {/* Sección de Comunicación */}
-            <div className="admin-card">
-              <div className="card-icon">📢</div>
-              <h2>Comunicación</h2>
-              <p>Envía anuncios masivos y gestiona inventario</p>
-              <button 
-                className="card-button"
-                onClick={() => setActiveSection('communication')}
-              >
-                Ir a Comunicación
               </button>
             </div>
 
