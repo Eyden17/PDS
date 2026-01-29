@@ -20,6 +20,66 @@
   font-weight: 600;
 }
 
+.class-students-panel{
+  margin-top: 16px;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 14px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.panel-header{
+  display:flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+}
+
+.panel-toolbar{
+  display:flex;
+  gap: 12px;
+  align-items:center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+}
+
+.panel-list{
+  max-height: 360px;
+  overflow: auto;
+  padding: 8px 16px;
+}
+
+.student-row{
+  display:flex;
+  gap: 10px;
+  align-items:center;
+  padding: 10px 8px;
+  border-radius: 10px;
+  cursor:pointer;
+}
+
+.student-row:hover{
+  background: rgba(0,0,0,.03);
+}
+
+.student-row.checked{
+  background: rgba(46, 204, 113, 0.08);
+}
+
+.student-meta .student-name{
+  font-weight: 600;
+}
+
+.panel-footer{
+  display:flex;
+  justify-content:flex-end;
+  gap: 10px;
+  padding: 12px 16px;
+  border-top: 1px solid rgba(0,0,0,.06);
+}
+
+
 .btn-add-class {
   padding: 12px 24px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

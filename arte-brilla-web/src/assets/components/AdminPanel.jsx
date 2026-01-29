@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import StudentManagement from './StudentManagement';
 import PaymentManagement from './PaymentManagement';
 import NewsManagement from './NewsManagement';
@@ -7,8 +8,15 @@ import ReportManagement from './ReportManagement';
 import '../styles/AdminPanel.css';
 
 const AdminPanel = () => {
-  
+  const location = useLocation();
   const [activeSection, setActiveSection] = useState('dashboard');
+
+  useEffect(() => {
+    const section = new URLSearchParams(location.search).get('section');
+    if (section && ['students', 'payments', 'news', 'classes', 'reports', 'dashboard'].includes(section)) {
+      setActiveSection(section);
+    }
+  }, [location.search]);
 
   
   const renderSection = () => {
