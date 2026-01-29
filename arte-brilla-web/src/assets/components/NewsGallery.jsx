@@ -163,13 +163,12 @@ const NewsGallery = ({ articles = null } = {}) => {
         <div className="container">
           <div className="section-header">
             <h2>Noticias</h2>
-            <p className="muted">Últimas actualizaciones e imágenes de la academia</p>
           </div>
 
           <div className="news-empty">
             <div className="news-empty-icon"><CameraIcon /></div>
             <h3>No hay noticias aún</h3>
-            <p className="muted">Cuando publiques una noticia, aparecerá aquí automáticamente.</p>
+            <p className="muted">Cuando se publique una noticia, aparecerá aquí automáticamente.</p>
           </div>
         </div>
       </section>
