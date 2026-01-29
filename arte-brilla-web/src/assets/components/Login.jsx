@@ -11,6 +11,20 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const handleKeyDown = (e) => {
+    if (e.key !== 'Enter') {
+      return;
+    }
+
+    e.preventDefault();
+
+    if (isLoading || !email || !password) {
+      return;
+    }
+
+    handleSubmit(e);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -38,7 +52,7 @@ const Login = () => {
           <p className="login-subtitle">Arte Brilla - Academia de Danza</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
+        <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="login-form">
           <div className="form-group">
             <label htmlFor="email">Correo</label>
             <input
