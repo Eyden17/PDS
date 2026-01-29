@@ -37,12 +37,14 @@ function mapDbNewsToCard(n) {
   const content = n.content ?? '';
   const short = n.short_description ?? (content ? String(content).slice(0, 140) : '');
   const image = n.cover_url ?? n.cover_media_url ?? null;
+  const createdAt = n.created_at ?? n.createdAt ?? null;
 
   return {
     id: n.id,
     title,
     image,
     excerpt: short,
+    createdAt,
   };
 }
 
@@ -138,8 +140,11 @@ const NewsGallery = ({ articles = null } = {}) => {
   }, [usePassed]);
 
   const newsItems = useMemo(() => {
-    if (usePassed) return Array.isArray(articles) ? articles : [];
-    return apiNews;
+    if (usePassed) {
+      const arr = Array.isArray(articles) ? articles : [];
+      return arr.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    }
+    return apiNews.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
   }, [usePassed, articles, apiNews]);
 
   // ✅ Skeleton solo cuando viene del API y está cargando
@@ -183,49 +188,26 @@ const NewsGallery = ({ articles = null } = {}) => {
           <p className="muted">Últimas actualizaciones e imágenes de la academia</p>
         </div>
 
-        {newsItems.length > 1 ? (
-          <div className="news-featured">
-            <article className="featured-card">
-              <div className="featured-media">
-                <MediaBlock item={newsItems[0]} large />
-              </div>
-              <div className="news-card-body">
-                <h3>{newsItems[0].title}</h3>
-                {newsItems[0].excerpt && <p className="muted excerpt">{newsItems[0].excerpt}</p>}
-                <Link to={`/news/${newsItems[0].id}`} className="read-more">Leer</Link>
-              </div>
-            </article>
-
-            <div className="featured-list">
-              {newsItems.slice(1).map(item => (
-                <article key={item.id} className="news-card small">
-                  <div className="card-media">
-                    <MediaBlock item={item} />
-                  </div>
-                  <div className="news-card-body">
-                    <h4>{item.title}</h4>
-                    <Link to={`/news/${item.id}`} className="read-more">Leer</Link>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="news-grid">
-            {newsItems.map(item => (
-              <article key={item.id} className="news-card">
-                <div className="card-media">
-                  <MediaBlock item={item} large />
-                </div>
-                <div className="news-card-body">
-                  <h3>{item.title}</h3>
-                  {item.excerpt && <p className="muted excerpt">{item.excerpt}</p>}
-                  <Link to={`/news/${item.id}`} className="read-more">Leer</Link>
+        <div className="news-masonry-container">
+          {newsItems.map((item) => (
+            <div key={item.id} className="news-masonry-item">
+              <article className="news-masonry-card">
+                <MediaBlock item={item} large />
+                <div className="news-masonry-overlay">
+                  <h3 className="news-masonry-title">{item.title}</h3>
+                  <p className="news-masonry-meta">
+                    {new Date(item.createdAt || Date.now()).toLocaleDateString('es-ES', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </p>
+                  <Link to={`/news/${item.id}`} className="masonry-link">Leer</Link>
                 </div>
               </article>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
 
       </div>
     </section>
