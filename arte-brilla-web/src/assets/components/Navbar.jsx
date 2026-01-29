@@ -10,6 +10,7 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, logout } = useAuth();
+  const enableAdmin = import.meta.env.VITE_ENABLE_ADMIN === 'true';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -52,12 +53,12 @@ const Navbar = () => {
           <li><Link to="/about" className={`nav-link ${location.pathname === '/about' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Nosotros</Link></li>
           <li><Link to="/classes" className={`nav-link ${location.pathname === '/classes' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Clases</Link></li>
           <li><Link to="/contact" className={`nav-link ${location.pathname === '/contact' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Contacto</Link></li>
-          {isAuthenticated && (
+          {enableAdmin && isAuthenticated && (
             <li className="nav-button-wrapper">
               <Link to="/admin" className={`nav-button ${location.pathname === '/admin' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Panel Admin</Link>
             </li>
           )}
-          {isAuthenticated && (
+          {enableAdmin && isAuthenticated && (
             <li className="nav-button-wrapper">
               <button 
                 onClick={() => {

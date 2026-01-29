@@ -19,9 +19,13 @@ import AdminPanel from './assets/components/AdminPanel';
 import ProtectedRoute from './assets/components/ProtectedRoute';
 import NotFound from './assets/components/NotFound';
 import NewsDetail from './assets/components/NewsDetail';
+import ClassStudentsPage from "./assets/components/ClassStudentsPage";
+
 import './assets/styles/App.css'
 
 function App() {
+  const enableAdmin = import.meta.env.VITE_ENABLE_ADMIN === 'true';
+
   return (
     <Router>
       <AuthProvider>
@@ -41,25 +45,36 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/classes" element={<Classes />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/login" element={<Login />} />
               <Route path="/news/:id" element={<NewsDetail />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute>
-                    <AdminPanel />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/*"
-                element={
-                  <ProtectedRoute>
-                    <AdminPanel />
-                  </ProtectedRoute>
-                }
-              />
+              {enableAdmin && (
+                <Route path="/login" element={<Login />} />
+              )}
+              {enableAdmin && (
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+              )}
+              {enableAdmin && (
+                <Route path="/classes/:id/students" element={<ClassStudentsPage />} />
+              )}
+              {enableAdmin && (
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute>
+                      <AdminPanel />
+                    </ProtectedRoute>
+                  }
+                />
+              )}
+              {enableAdmin && (
+                <Route
+                  path="/admin/*"
+                  element={
+                    <ProtectedRoute>
+                      <AdminPanel />
+                    </ProtectedRoute>
+                  }
+                />
+              )}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
