@@ -20,7 +20,7 @@ const NewsManagement = () => {
     descripcionCorta: '',
     contenido: '',
     imagenPreview: null,      // preview en UI (base64 o url)
-    categoria: 'anuncio',     // UI usa lowercase
+    categoria: 'ANUNCIO',
     autor: 'Admin',           // solo UI
     activa: true
   });
@@ -150,7 +150,7 @@ const NewsManagement = () => {
       descripcionCorta: '',
       contenido: '',
       imagenPreview: null,
-      categoria: 'anuncio',
+      categoria: 'ANUNCIO',
       autor: 'Admin',
       activa: true
     });
@@ -216,11 +216,10 @@ const NewsManagement = () => {
       const payload = {
         title: formData.titulo.trim(),
         category: String(formData.categoria || 'ANUNCIO').toUpperCase(),
+        short_description: formData.descripcionCorta.trim(),
         content: formData.contenido.trim(),
         cover_media_id: coverMediaId, // puede ser null
         is_published: Boolean(formData.activa),
-        // si tu API soporta short_description, mándalo:
-        // short_description: formData.descripcionCorta?.trim() || null,
       };
 
       if (editingId) {
@@ -244,7 +243,7 @@ const NewsManagement = () => {
     setFormData({
       ...newsItem,
       // asegurá que el select use el valor correcto
-      categoria: (newsItem.categoria ?? 'anuncio').toLowerCase(),
+      categoria: (newsItem.categoria ?? 'ANUNCIO'),
     });
     setEditingId(newsItem.id);
     setShowForm(true);
