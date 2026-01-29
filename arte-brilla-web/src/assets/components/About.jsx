@@ -17,7 +17,7 @@ export default function About() {
             Arte Brilla Dance Studio
           </p>
           <p className="about-lema" style={{fontStyle: 'italic', marginTop: '10px', fontSize: '1.1em'}}>
-            "La danza transmite el ritmo que hay dentro de ti."
+            "La danza expresa el gozo de tu corazón."
           </p>
         </div>
 
