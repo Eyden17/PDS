@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { authService } from '../../services/authService';
 import '../styles/ForgotPassword.css';
 
 const ForgotPassword = () => {
@@ -7,7 +8,7 @@ const ForgotPassword = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [step, setStep] = useState(1); // 1: email, 2: código, 3: nueva contraseña
+  const [step, setStep] = useState(1); // 1: email, 2: código, 3: nueva contraseÃ±a
   const [code, setCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -20,24 +21,11 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/forgot-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage('Se ha enviado un código de recuperación a tu correo. Por favor revisa tu bandeja de entrada.');
-        setStep(2);
-      } else {
-        setError(data.message || 'Error al enviar el correo de recuperación');
-      }
-    } catch {
-      setError('Error de conexión. Por favor intenta de nuevo.');
+      await authService.forgotPassword(email);
+      setMessage('Se ha enviado un código de recuperación a tu correo. Por favor revisa tu bandeja de entrada.');
+      setStep(2);
+    } catch (e) {
+      setError(e?.message || 'Error de conexión. Por favor intenta de nuevo.');
     }
 
     setIsLoading(false);
@@ -50,24 +38,11 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/verify-code`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, code }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage('Código verificado correctamente. Ahora puedes crear una nueva contraseña.');
-        setStep(3);
-      } else {
-        setError(data.message || 'Código inválido o expirado');
-      }
-    } catch {
-      setError('Error de conexión. Por favor intenta de nuevo.');
+      await authService.verifyCode(email, code);
+      setMessage('Código verificado correctamente. Ahora puedes crear una nueva contraseña.');
+      setStep(3);
+    } catch (e) {
+      setError(e?.message || 'Error de conexión. Por favor intenta de nuevo.');
     }
 
     setIsLoading(false);
@@ -91,26 +66,13 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/reset-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, code, newPassword }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage('Contraseña actualizada correctamente. Redirigiendo al login...');
-        setTimeout(() => {
-          navigate('/login');
-        }, 2000);
-      } else {
-        setError(data.message || 'Error al actualizar la contraseña');
-      }
-    } catch {
-      setError('Error de conexión. Por favor intenta de nuevo.');
+      await authService.resetPassword(email, code, newPassword);
+      setMessage('Contraseña actualizada correctamente. Redirigiendo al login...');
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+    } catch (e) {
+      setError(e?.message || 'Error de conexión. Por favor intenta de nuevo.');
     }
 
     setIsLoading(false);
