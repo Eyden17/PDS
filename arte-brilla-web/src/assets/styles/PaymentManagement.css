@@ -1657,3 +1657,11 @@
     text-align: center;
   }
 }
+
+.invoice-modal {
+  max-width: 420px;
+}
+
+.invoice-modal .modal-body p {
+  margin-bottom: 8px;
+}

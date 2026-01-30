@@ -3,6 +3,7 @@ import { studentService } from "../../services/studentService";
 import { monthlyFeeService } from "../../services/monthlyFeeService";
 import { paymentService } from "../../services/paymentService";
 import { classService } from "../../services/classService";
+import { generateInvoicePDF } from "../../services/generateInvoicePDF";
 import "../styles/PaymentManagement.css";
 
 function monthNameEs(m) {
@@ -57,6 +58,10 @@ const PaymentManagement = () => {
   const [generateGroupId, setGenerateGroupId] = useState("");
   const [generateStatus, setGenerateStatus] = useState(null);
   const [generateLoading, setGenerateLoading] = useState(false);
+
+  // ===== generar factura =====
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [lastPaymentData, setLastPaymentData] = useState(null);
 
   useEffect(() => {
     const current = new Date();
@@ -265,10 +270,28 @@ const PaymentManagement = () => {
         paid_at: todayISO(),
       });
 
+      setLastPaymentData({
+        studentName: selectedRow.student_name,
+        identification: selectedRow.identification,
+        groupName: selectedRow.group_name,
+        period: `${monthNameEs(selectedRow.month)} ${selectedRow.year}`,
+        paymentDate: todayISO(),
+        paymentMethod,
+        reference: paymentReference,
+        amountPaid: monto,
+        totalPaid: Number(selectedRow.amount_paid_total || 0) + monto,
+        balanceAfter: Math.max(
+          0,
+          Number(selectedRow.balance_due || 0) - monto
+        )
+      });
+
+      // Abrimos modal de factura
+      setShowInvoiceModal(true);
+
       setShowPaymentModal(false);
       setSelectedRow(null);
 
-      await fetchAll(filterYear, filterMonth);
     } catch (e) {
       alert(e?.message || "Error registrando pago");
     } finally {
@@ -811,6 +834,66 @@ const PaymentManagement = () => {
           </div>
         </div>
       )}
+
+      {showInvoiceModal && lastPaymentData && (
+      <div className="modal-overlay" onClick={() => setShowInvoiceModal(false)}>
+        <div className="modal-content invoice-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <h3>📄 Generar Factura</h3>
+            <button className="btn-close" onClick={() => setShowInvoiceModal(false)}>
+              ✕
+            </button>
+          </div>
+
+          <div className="modal-body">
+            <p style={{ fontSize: 15 }}>
+              El pago se registró correctamente ✅
+            </p>
+
+            <div
+              style={{
+                marginTop: 12,
+                padding: 12,
+                borderRadius: 10,
+                background: "#f7f7f7",
+                fontSize: 14
+              }}
+            >
+              <p><strong>Estudiante:</strong> {lastPaymentData.studentName}</p>
+              <p><strong>Monto pagado:</strong> ₡{lastPaymentData.amountPaid.toLocaleString()}</p>
+              <p><strong>Saldo restante:</strong> ₡{lastPaymentData.balanceAfter.toLocaleString()}</p>
+            </div>
+
+            <p style={{ marginTop: 16 }}>
+              ¿Desea generar la factura en PDF?
+            </p>
+          </div>
+
+          <div className="modal-actions">
+            <button
+              className="btn-confirm"
+              onClick={() => {
+                generateInvoicePDF(lastPaymentData);
+                setShowInvoiceModal(false);
+                setLastPaymentData(null);
+              }}
+            >
+              📥 Generar PDF
+            </button>
+
+            <button
+              className="btn-cancel-modal"
+              onClick={() => {
+                setShowInvoiceModal(false);
+                setLastPaymentData(null);
+              }}
+            >
+              No, gracias
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     </div>
   );
 };
