@@ -58,13 +58,13 @@ const ClassesManagement = () => {
 
   const [formData, setFormData] = useState({
     nombre: "",
-    teacher_id: "",            // ✅ ahora guardamos el id real
-    instructor_name: "",       // solo para UI (opcional)
+    teacher_id: "",
+    instructor_name: "",
     group_id: "",
     area: "Babies",
-    horario: "",               // schedule_days (texto)
-    start_time: "",            // ✅ select inicio
-    end_time: "",              // ✅ select fin
+    horario: "",
+    start_time: "",
+    end_time: "",
     capacidad: 15,
     nivel: "Principiante",
     descripcion: "",
@@ -595,6 +595,7 @@ const ClassesManagement = () => {
         {clasesFiltradas.length === 0 ? (
           <div className="empty-state">
             <p>📚 {filterBusqueda || filterArea !== "Todas" ? "No se encontraron clases con los filtros aplicados" : "No hay clases creadas aún"}</p>
+            <br />
             <small>Crea tu primera clase para comenzar</small>
           </div>
         ) : (

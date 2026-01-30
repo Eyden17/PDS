@@ -218,7 +218,31 @@ const ReportManagement = () => {
         </div>
 
         {/* estados */}
-        {loading && <div className="empty-state"><p>\n              <i className="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>\n              <span>Cargando reporte...</span>\n            </p></div>}
+        {loading && (
+          <div className="report-skeleton" aria-live="polite" aria-busy="true">
+            <div className="kpi-grid">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={`kpi-skel-${i}`} className="kpi-card">
+                  <div className="skeleton skeleton-icon" />
+                  <div className="kpi-content" style={{ width: "100%" }}>
+                    <div className="skeleton skeleton-text short" />
+                    <div className="skeleton skeleton-text long" />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="chart-section" style={{ marginBottom: 24 }}>
+              <div className="skeleton skeleton-title" />
+              <div className="skeleton skeleton-table" />
+            </div>
+
+            <div className="chart-section">
+              <div className="skeleton skeleton-title" />
+              <div className="skeleton skeleton-table" />
+            </div>
+          </div>
+        )}
         {!loading && error && <div className="empty-state error-state"><p>\n              <i className="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>\n              <span>{error}</span>\n            </p></div>}
 
         {!loading && !error && (

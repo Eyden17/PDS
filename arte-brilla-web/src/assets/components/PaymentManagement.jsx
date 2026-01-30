@@ -394,6 +394,7 @@ const PaymentManagement = () => {
       <div className="management-header">
         <div>
           <h2>Control Financiero</h2>
+          <br />
           <p className="header-subtitle">Gestión de cuotas mensuales, pagos y control de cobranza</p>
         </div>
 

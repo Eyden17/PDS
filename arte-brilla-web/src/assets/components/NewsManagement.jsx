@@ -344,90 +344,122 @@ const NewsManagement = () => {
         </div>
       )}
       {loading && (
-        <div className="empty-state">
-          <p>
-            <i className="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
-            <span>Cargando...</span>
-          </p>
+        <div className="news-skeleton" aria-live="polite" aria-busy="true">
+          <div className="stats-section">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={`news-stat-skel-${i}`} className="stat-card">
+                <div className="skeleton skeleton-icon" />
+                <div className="stat-content" style={{ width: "100%" }}>
+                  <div className="skeleton skeleton-text short" />
+                  <div className="skeleton skeleton-text long" />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="filters-section">
+            <div className="skeleton skeleton-title" />
+            <div className="filters-grid">
+              <div className="skeleton skeleton-input" />
+              <div className="skeleton skeleton-input" />
+            </div>
+          </div>
+
+          <div className="news-grid-container">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={`news-card-skel-${i}`} className="news-card">
+                <div className="skeleton skeleton-image" />
+                <div className="news-card-content">
+                  <div className="skeleton skeleton-text long" />
+                  <div className="skeleton skeleton-text short" />
+                  <div className="skeleton skeleton-text short" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Estadísticas */}
-      <div className="stats-section">
-        <div className="stat-card">
-          <div className="stat-icon">📊</div>
-          <div className="stat-content">
-            <div className="stat-label">Total de Noticias</div>
-            <div className="stat-value">{news.length}</div>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">✅</div>
-          <div className="stat-content">
-            <div className="stat-label">Noticias Activas</div>
-            <div className="stat-value">{statsActivas}</div>
-          </div>
-        </div>
-        {Object.entries(categoriaStats).map(([cat, count]) => (
-          <div key={cat} className="stat-card">
-            <div className="stat-icon">
-              <i className={`fa-solid ${getCategoryIcon(cat)}`} aria-hidden="true"></i>
+      {!loading && (
+        <>
+          {/* Estadísticas */}
+          <div className="stats-section">
+            <div className="stat-card">
+              <div className="stat-icon">📊</div>
+              <div className="stat-content">
+                <div className="stat-label">Total de Noticias</div>
+                <div className="stat-value">{news.length}</div>
+              </div>
             </div>
-            <div className="stat-content">
-              <div className="stat-label">{cat}</div>
-              <div className="stat-value">{count}</div>
+            <div className="stat-card">
+              <div className="stat-icon">✅</div>
+              <div className="stat-content">
+                <div className="stat-label">Noticias Activas</div>
+                <div className="stat-value">{statsActivas}</div>
+              </div>
             </div>
+            {Object.entries(categoriaStats).map(([cat, count]) => (
+              <div key={cat} className="stat-card">
+                <div className="stat-icon">
+                  <i className={`fa-solid ${getCategoryIcon(cat)}`} aria-hidden="true"></i>
+                </div>
+                <div className="stat-content">
+                  <div className="stat-label">{cat}</div>
+                  <div className="stat-value">{count}</div>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* Filtros */}
-      <div className="filters-section">
-        <div className="filters-header">
-          <h3>🔍 Filtros</h3>
-          {(filterCategoria !== 'Todas' || filterBusqueda) && (
-            <button
-              className="btn-reset-filters"
-              onClick={() => {
-                setFilterCategoria('Todas');
-                setFilterBusqueda('');
-              }}
-            >
-              Limpiar filtros
-            </button>
-          )}
-        </div>
-        <div className="filters-grid">
-          <div className="filter-group">
-            <label>Búsqueda</label>
-            <input
-              type="text"
-              placeholder="Buscar por título o descripción..."
-              value={filterBusqueda}
-              onChange={(e) => setFilterBusqueda(e.target.value)}
-              className="filter-input"
-            />
+          {/* Filtros */}
+          <div className="filters-section">
+            <div className="filters-header">
+              <h3>🔍 Filtros</h3>
+              {(filterCategoria !== 'Todas' || filterBusqueda) && (
+                <button
+                  className="btn-reset-filters"
+                  onClick={() => {
+                    setFilterCategoria('Todas');
+                    setFilterBusqueda('');
+                  }}
+                >
+                  Limpiar filtros
+                </button>
+              )}
+            </div>
+            <div className="filters-grid">
+              <div className="filter-group">
+                <label>Búsqueda</label>
+                <input
+                  type="text"
+                  placeholder="Buscar por título o descripción..."
+                  value={filterBusqueda}
+                  onChange={(e) => setFilterBusqueda(e.target.value)}
+                  className="filter-input"
+                />
+              </div>
+              <div className="filter-group">
+                <label>Categoría</label>
+                <select
+                  value={filterCategoria}
+                  onChange={(e) => setFilterCategoria(e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="Todas">Todas las categorías</option>
+                  {categorias.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            {noticiasFiltradas.length > 0 && (
+              <div className="filters-result">
+                Mostrando {noticiasFiltradas.length} de {news.length} noticias
+              </div>
+            )}
           </div>
-          <div className="filter-group">
-            <label>Categoría</label>
-            <select
-              value={filterCategoria}
-              onChange={(e) => setFilterCategoria(e.target.value)}
-              className="filter-select"
-            >
-              <option value="Todas">Todas las categorías</option>
-              {categorias.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-        {noticiasFiltradas.length > 0 && (
-          <div className="filters-result">
-            Mostrando {noticiasFiltradas.length} de {news.length} noticias
-          </div>
-        )}
-      </div>
+        </>
+      )}
 
       {/* Formulario */}
       {showForm && !isTeacher && (
@@ -581,10 +613,12 @@ const NewsManagement = () => {
       )}
 
       {/* Grid de Noticias */}
+      {!loading && (
       <div className="news-grid-container">
         {noticiasFiltradas.length === 0 ? (
           <div className="empty-state">
             <p>📰 {filterBusqueda || filterCategoria !== 'Todas' ? 'No se encontraron noticias con los filtros aplicados' : 'No hay noticias creadas aún'}</p>
+            <br />
             <small>Crea tu primera noticia para comenzar</small>
           </div>
         ) : (
@@ -595,14 +629,14 @@ const NewsManagement = () => {
             >
               {newsItem.imagenPreview && (
                 <div className="news-image">
-<img
-  src={newsItem.imagenPreview}
-  alt={newsItem.titulo}
-  onError={(e) => {
-    console.error('No cargó la imagen:', newsItem.imagenPreview);
-    e.currentTarget.style.display = 'none';
-  }}
-/>
+                  <img
+                    src={newsItem.imagenPreview}
+                    alt={newsItem.titulo}
+                    onError={(e) => {
+                      console.error('No cargó la imagen:', newsItem.imagenPreview);
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
                   <span
                     className="category-badge"
                     style={{ backgroundColor: colorCategoria[newsItem.categoria] }}
@@ -654,6 +688,7 @@ const NewsManagement = () => {
           ))
         )}
       </div>
+      )}
 
       {/* Modal de Eliminación */}
       {deleteModal && !isTeacher && (
