@@ -9,10 +9,17 @@ export const AuthProvider = ({ children }) => {
   const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 
   useEffect(() => {
-    // Always clear session on page access
-    localStorage.removeItem('ab_session');
-    setIsAuthenticated(false);
-    setUser(null);
+    const raw = localStorage.getItem("ab_session");
+    const session = raw ? JSON.parse(raw) : null;
+
+    if (session?.accessToken && session?.user) {
+      setIsAuthenticated(true);
+      setUser(session.user);
+    } else {
+      setIsAuthenticated(false);
+      setUser(null);
+    }
+
     setLoading(false);
   }, []);
 
@@ -31,6 +38,7 @@ export const AuthProvider = ({ children }) => {
 
     const session = {
       accessToken: body.accessToken,
+      refreshToken: body.refreshToken,
       user: { id: body.user.id, email: body.user.email, role: body.role }
     };
 

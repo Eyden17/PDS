@@ -1,9 +1,23 @@
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const SESSION_KEY = "ab_session";
 
 function getAccessToken() {
-  const raw = localStorage.getItem('ab_session');
+  const raw = localStorage.getItem(SESSION_KEY);
   const session = raw ? JSON.parse(raw) : null;
   return session?.accessToken || null;
+}
+
+function getSession() {
+  const raw = localStorage.getItem(SESSION_KEY);
+  return raw ? JSON.parse(raw) : null;
+}
+
+function setSession(session) {
+  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+}
+
+function clearSession() {
+  localStorage.removeItem(SESSION_KEY);
 }
 
 function buildUrl(path) {
@@ -12,22 +26,54 @@ function buildUrl(path) {
   return `${base}${p}`;
 }
 
+async function refreshAccessToken() {
+  const session = getSession();
+  if (!session?.refreshToken) return false;
+
+  const res = await fetch(buildUrl("/api/auth/refresh"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refreshToken: session.refreshToken }),
+  });
+
+  if (!res.ok) return false;
+
+  const body = await res.json().catch(() => ({}));
+  if (!body?.accessToken) return false;
+
+  const nextSession = {
+    ...session,
+    accessToken: body.accessToken,
+    refreshToken: body.refreshToken || session.refreshToken,
+    user: body.user || session.user,
+  };
+
+  setSession(nextSession);
+  return true;
+}
+
 export async function apiFetch(path, options = {}) {
+  const { _retry, ...fetchOptions } = options;
   const token = getAccessToken();
 
   const headers = {
-    ...(options.headers || {}),
+    ...(fetchOptions.headers || {}),
     ...(token ? { Authorization: `Bearer ${token}` } : {})
   };
 
   const res = await fetch(buildUrl(path), {
-    ...options,
+    ...fetchOptions,
     headers
   });
 
   if (res.status === 401) {
-    localStorage.removeItem('ab_session');
-    window.location.href = '/login';
+    const isRefreshCall = path === "/api/auth/refresh";
+    if (!_retry && !isRefreshCall && (await refreshAccessToken())) {
+      return apiFetch(path, { ...fetchOptions, _retry: true });
+    }
+
+    clearSession();
+    window.location.href = "/login";
     return;
   }
 
