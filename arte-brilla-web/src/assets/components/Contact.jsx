@@ -83,7 +83,7 @@ function Contact() {
               <div className="info-text">
                 <h3>Ubicación</h3>
                 <p><strong>Conversatorio SINEM (contiguo al Gimnasio Eddy Bermúdez)<br />Limón centro</strong></p>
-                <p><a href="https://goo.gl/maps/..." target="_blank" rel="noopener noreferrer" className="map-link">Ver en Google Maps</a></p>
+                <p><a href="https://maps.app.goo.gl/FSH6idUBdTiSeAK3A" target="_blank" rel="noopener noreferrer" className="map-link">Ver en Google Maps</a></p>
               </div>
             </div>
 
