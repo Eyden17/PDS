@@ -7,7 +7,7 @@ const Hero = () => {
       {/* Fondo con imagen */}
       <div className="hero-background">
         <img 
-          src="https://images.unsplash.com/photo-1508807526345-15e9b5f4eaff?q=80&w=2070&auto=format&fit=crop" 
+          src="https://fkikijbwjzgoxolqyrqp.supabase.co/storage/v1/object/public/public-media/web-media/hero_img.webp" 
           alt="Estudiantes de danza en clase"
           className="hero-bg-image"
         />
