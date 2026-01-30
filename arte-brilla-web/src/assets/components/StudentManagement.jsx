@@ -1,8 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useAuth } from '../../context/useAuth';
 import { studentService } from '../../services/studentService';
 import '../styles/StudentManagement.css';
 
 const StudentManagement = () => {
+  const { user } = useAuth();
+  const role = user?.role || '';
+  const isTeacher = String(role).toUpperCase() === 'TEACHER';
+
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -179,6 +184,7 @@ const StudentManagement = () => {
   };
 
   const handleAddStudent = async () => {
+    if (isTeacher) return;
     const validationMessage = validateForm();
     if (validationMessage) {
       setFormError(validationMessage);
@@ -289,6 +295,7 @@ const StudentManagement = () => {
 
 
   const handleEditStudent = (student) => {
+    if (isTeacher) return;
     setFormError('');
     setOriginalFormData({
       cedula: student.cedula ?? '',
@@ -321,10 +328,12 @@ const StudentManagement = () => {
 
 
   const handleDeleteStudent = (id) => {
+    if (isTeacher) return;
     setDeleteConfirm(id);
   };
 
   const confirmDeleteStudent = async (id) => {
+    if (isTeacher) return;
     try {
       setLoading(true);
       setError(null);
@@ -342,6 +351,7 @@ const StudentManagement = () => {
 
 
   const handleCancel = () => {
+    if (isTeacher) return;
     setShowForm(false);
     setEditingId(null);
     setFormData({
@@ -407,31 +417,33 @@ const StudentManagement = () => {
           <h2>Gestión de Estudiantes</h2>
           <p className="header-subtitle">Administra información de estudiantes, grupos y expedientes</p>
         </div>
-        <button 
-          className="btn-add-student"
-          onClick={() => {
-            if (showForm) {
-              handleCancel();
-            } else {
-              setEditingId(null);
-              setFormData({
-                cedula: '',
-                nombre: '',
-                apellido: '',
-                segundoApellido: '',
-                edad: '',
-                encargado: '',
-                telefonoEncargado: '',
-                observaciones: '',
-                grupo: '',
-                activo: true
-              });
-              setShowForm(true);
-            }
-          }}
-        >
-          {showForm ? '✕ Cancelar' : '+ Agregar Estudiante'}
-        </button>
+        {!isTeacher && (
+          <button 
+            className="btn-add-student"
+            onClick={() => {
+              if (showForm) {
+                handleCancel();
+              } else {
+                setEditingId(null);
+                setFormData({
+                  cedula: '',
+                  nombre: '',
+                  apellido: '',
+                  segundoApellido: '',
+                  edad: '',
+                  encargado: '',
+                  telefonoEncargado: '',
+                  observaciones: '',
+                  grupo: '',
+                  activo: true
+                });
+                setShowForm(true);
+              }
+            }}
+          >
+            {showForm ? '✕ Cancelar' : '+ Agregar Estudiante'}
+          </button>
+        )}
       </div>
 
       {/* Tarjetas de Estadísticas */}
@@ -456,7 +468,7 @@ const StudentManagement = () => {
       </div>
 
       {/* Formulario */}
-      {showForm && (
+      {showForm && !isTeacher && (
         <div className="form-container">
           <h3 className="form-title">{editingId ? 'Editar Estudiante' : 'Nuevo Estudiante'}</h3>
           <form className="student-form">
@@ -724,22 +736,24 @@ const StudentManagement = () => {
                     <span className="obs-text">{student.observaciones || '-'}</span>
                   </td>
                   <td className="col-actions">
-                    <div className="action-buttons">
-                      <button
-                        className="btn-action btn-edit"
-                        onClick={() => handleEditStudent(student)}
-                        title="Editar"
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        className="btn-action btn-delete"
-                        onClick={() => handleDeleteStudent(student.id)}
-                        title="Eliminar"
-                      >
-                        🗑️
-                      </button>
-                    </div>
+                    {!isTeacher && (
+                      <div className="action-buttons">
+                        <button
+                          className="btn-action btn-edit"
+                          onClick={() => handleEditStudent(student)}
+                          title="Editar"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          className="btn-action btn-delete"
+                          onClick={() => handleDeleteStudent(student.id)}
+                          title="Eliminar"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -753,7 +767,7 @@ const StudentManagement = () => {
       </div>
 
       {/* Modal de Confirmación para Eliminar */}
-      {deleteConfirm && (
+      {deleteConfirm && !isTeacher && (
         <div className="modal-overlay delete-modal-overlay">
           <div className="delete-modal">
             <div className="delete-modal-header">

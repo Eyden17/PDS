@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/useAuth';
 import StudentManagement from './StudentManagement';
 import PaymentManagement from './PaymentManagement';
 import NewsManagement from './NewsManagement';
@@ -10,13 +11,31 @@ import '../styles/AdminPanel.css';
 const AdminPanel = () => {
   const location = useLocation();
   const [activeSection, setActiveSection] = useState('dashboard');
+  const { user } = useAuth();
+  const role = user?.role || '';
+  const isTeacher = String(role).toUpperCase() === 'TEACHER';
+
+  const allowedSections = useMemo(() => {
+    if (isTeacher) {
+      return ['dashboard', 'students', 'classes'];
+    }
+    return ['dashboard', 'students', 'payments', 'news', 'classes', 'reports'];
+  }, [isTeacher]);
 
   useEffect(() => {
     const section = new URLSearchParams(location.search).get('section');
-    if (section && ['students', 'payments', 'news', 'classes', 'reports', 'dashboard'].includes(section)) {
+    if (section && allowedSections.includes(section)) {
       setActiveSection(section);
+    } else if (section && !allowedSections.includes(section)) {
+      setActiveSection('dashboard');
     }
-  }, [location.search]);
+  }, [location.search, allowedSections]);
+
+  useEffect(() => {
+    if (!allowedSections.includes(activeSection)) {
+      setActiveSection('dashboard');
+    }
+  }, [activeSection, allowedSections]);
 
   
   const renderSection = () => {
@@ -24,12 +43,15 @@ const AdminPanel = () => {
       case 'students':
         return <StudentManagement />;
       case 'payments':
+        if (isTeacher) return null;
         return <PaymentManagement />;
       case 'news':
+        if (isTeacher) return null;
         return <NewsManagement />;
       case 'classes':
         return <ClassesManagement />;
       case 'reports':
+        if (isTeacher) return null;
         return <ReportManagement />;
       default:
         return (
@@ -47,32 +69,6 @@ const AdminPanel = () => {
               </button>
             </div>
 
-            {/* Sección de Pagos */}
-            <div className="admin-card">
-              <div className="card-icon">💰</div>
-              <h2>Control Financiero</h2>
-              <p>Tabla de pagos, semáforo de estado y facturación</p>
-              <button 
-                className="card-button"
-                onClick={() => setActiveSection('payments')}
-              >
-                Ir a Pagos
-              </button>
-            </div>
-
-            {/* Sección de Noticias */}
-            <div className="admin-card">
-              <div className="card-icon">📰</div>
-              <h2>Gestión de Noticias</h2>
-              <p>Crea y publica noticias con duración automática</p>
-              <button 
-                className="card-button"
-                onClick={() => setActiveSection('news')}
-              >
-                Ir a Noticias
-              </button>
-            </div>
-
             {/* Sección de Clases */}
             <div className="admin-card">
               <div className="card-icon">📚</div>
@@ -86,13 +82,43 @@ const AdminPanel = () => {
               </button>
             </div>
 
-            {/* Sección de Reportes */}
-            <div className="admin-card">
-              <div className="card-icon">📊</div>
-              <h2>Reportes</h2>
-              <p>Genera reportes y estadísticas de la academia</p>
-              <button className="card-button" onClick={() => setActiveSection('reports')}>Ver Reportes</button>
-            </div>
+            {!isTeacher && (
+              <>
+                {/* Sección de Noticias */}
+                <div className="admin-card">
+                  <div className="card-icon">📰</div>
+                  <h2>Gestión de Noticias</h2>
+                  <p>Crea y publica noticias con duración automática</p>
+                  <button 
+                    className="card-button"
+                    onClick={() => setActiveSection('news')}
+                  >
+                    Ir a Noticias
+                  </button>
+                </div>
+
+                {/* Sección de Pagos */}
+                <div className="admin-card">
+                  <div className="card-icon">💰</div>
+                  <h2>Control Financiero</h2>
+                  <p>Tabla de pagos, semáforo de estado y facturación</p>
+                  <button 
+                    className="card-button"
+                    onClick={() => setActiveSection('payments')}
+                  >
+                    Ir a Pagos
+                  </button>
+                </div>
+
+                {/* Sección de Reportes */}
+                <div className="admin-card">
+                  <div className="card-icon">📊</div>
+                  <h2>Reportes</h2>
+                  <p>Genera reportes y estadísticas de la academia</p>
+                  <button className="card-button" onClick={() => setActiveSection('reports')}>Ver Reportes</button>
+                </div>
+              </>
+            )}
           </div>
         );
     }

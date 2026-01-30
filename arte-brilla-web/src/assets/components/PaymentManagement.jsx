@@ -858,10 +858,6 @@ const PaymentManagement = () => {
                   placeholder="Ej: 50000"
                 />
               </div>
-
-              <div style={{ marginTop: 8, opacity: 0.75, fontSize: 12 }}>
-                * Si tu RPC genera una cuota por estudiante activo, este monto será el “amount_due”.
-              </div>
             </div>
 
             <div className="modal-actions">

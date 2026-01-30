@@ -67,7 +67,7 @@ function App() {
               )}
               {enableAdmin && (
                 <Route
-                  path="/dashboard/*"
+                  path="/teacher"
                   element={
                     <ProtectedRoute>
                       <AdminPanel />

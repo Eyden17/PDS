@@ -9,8 +9,11 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
   const enableAdmin = import.meta.env.VITE_ENABLE_ADMIN === 'true';
+  const role = user?.role || '';
+  const isTeacher = String(role).toUpperCase() === 'TEACHER';
+  const panelPath = isTeacher ? '/teacher' : '/dashboard';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,7 +58,7 @@ const Navbar = () => {
           <li><Link to="/contact" className={`nav-link ${location.pathname === '/contact' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Contacto</Link></li>
           {enableAdmin && isAuthenticated && (
             <li className="nav-button-wrapper">
-              <Link to="/dashboard" className={`nav-button ${location.pathname === '/dashboard' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Panel Admin</Link>
+              <Link to={panelPath} className={`nav-button ${location.pathname === panelPath ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Panel Admin</Link>
             </li>
           )}
           {enableAdmin && isAuthenticated && (

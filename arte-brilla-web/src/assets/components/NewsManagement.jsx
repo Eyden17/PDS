@@ -1,10 +1,14 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useAuth } from '../../context/useAuth';
 import { newsService } from '../../services/newsService';
 import { mediaService } from '../../services/mediaService';
 import '../styles/NewsManagement.css';
 
 const NewsManagement = () => {
-  const [news, setNews] = useState([]); // ✅ ahora viene del API
+  const { user } = useAuth();
+  const role = user?.role || '';
+  const isTeacher = String(role).toUpperCase() === 'TEACHER';
+  const [news, setNews] = useState([]); // ahora viene del API
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [toastError, setToastError] = useState('');
@@ -164,6 +168,7 @@ const NewsManagement = () => {
   // Crear / Editar (API)
   // =========================
   const handleAddNews = async () => {
+    if (isTeacher) return;
     if (!formData.titulo?.trim() || !formData.contenido?.trim()) {
       setToastError('Completa los campos obligatorios.');
       return;
@@ -241,6 +246,7 @@ const NewsManagement = () => {
 
 
   const handleEditNews = (newsItem) => {
+    if (isTeacher) return;
     setImageFile(null); // para que no re-subas si no cambian imagen
     setFormData({
       ...newsItem,
@@ -253,10 +259,12 @@ const NewsManagement = () => {
 
 
   const handleDeleteNews = (newsItem) => {
+    if (isTeacher) return;
     setDeleteModal(newsItem);
   };
 
   const confirmarDelete = async () => {
+    if (isTeacher) return;
     try {
       // borrar noticia
       await newsService.remove(deleteModal.id);
@@ -312,16 +320,18 @@ const NewsManagement = () => {
       )}
       <div className="management-header">
         <h2>📰 Gestión de Noticias</h2>
-        <button
-          className="btn-add-news"
-          onClick={() => {
-            resetForm();
-            setShowForm(!showForm);
-          }}
-          disabled={loading}
-        >
-          {showForm ? '✕ Cancelar' : '+ Crear Noticia'}
-        </button>
+        {!isTeacher && (
+          <button
+            className="btn-add-news"
+            onClick={() => {
+              resetForm();
+              setShowForm(!showForm);
+            }}
+            disabled={loading}
+          >
+            {showForm ? '✕ Cancelar' : '+ Crear Noticia'}
+          </button>
+        )}
       </div>
 
       {/* Mensaje de error/cargando sin romper diseño */}
@@ -420,7 +430,7 @@ const NewsManagement = () => {
       </div>
 
       {/* Formulario */}
-      {showForm && (
+      {showForm && !isTeacher && (
         <div className="form-container">
           <form className="news-form">
             <h3>{editingId ? 'Editar Noticia' : 'Nueva Noticia'}</h3>
@@ -618,22 +628,26 @@ const NewsManagement = () => {
                 </div>
 
                 <div className="news-actions">
-                  <button
-                    className="btn-edit"
-                    onClick={() => handleEditNews(newsItem)}
-                    title="Editar"
-                    disabled={loading}
-                  >
-                    ✏️ Editar
-                  </button>
-                  <button
-                    className="btn-delete"
-                    onClick={() => handleDeleteNews(newsItem)}
-                    title="Eliminar"
-                    disabled={loading}
-                  >
-                    🗑️ Eliminar
-                  </button>
+                  {!isTeacher && (
+                    <>
+                      <button
+                        className="btn-edit"
+                        onClick={() => handleEditNews(newsItem)}
+                        title="Editar"
+                        disabled={loading}
+                      >
+                        ✏️ Editar
+                      </button>
+                      <button
+                        className="btn-delete"
+                        onClick={() => handleDeleteNews(newsItem)}
+                        title="Eliminar"
+                        disabled={loading}
+                      >
+                        🗑️ Eliminar
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -642,7 +656,7 @@ const NewsManagement = () => {
       </div>
 
       {/* Modal de Eliminación */}
-      {deleteModal && (
+      {deleteModal && !isTeacher && (
         <div className="modal-overlay delete-modal-overlay">
           <div className="delete-modal">
             <div className="delete-modal-header">
