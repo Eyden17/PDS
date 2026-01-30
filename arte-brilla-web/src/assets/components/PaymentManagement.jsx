@@ -72,6 +72,12 @@ const PaymentManagement = () => {
   // ===== helpers fees =====
   const getFeeStatus = (row) => {
     // row: { amount_due, status, balance_due, is_paid }
+    const due = Number(row.amount_due || 0);
+    const paid = Number(row.amount_paid_total || 0);
+    const balance = Number(row.balance_due || 0);
+    if (due <= 0 && paid <= 0 && balance <= 0) {
+      return { status: "none", label: "No matriculado", color: "#9e9e9e", icon: "—" };
+    }
     if (row.status === "PAID" || Number(row.balance_due) <= 0) {
       return { status: "paid", label: "Pagado", color: "#4CAF50", icon: "✓" };
     }
@@ -133,16 +139,12 @@ const PaymentManagement = () => {
         const last = student.last_name ?? "";
         const fullName = `${first} ${last}`.trim() || "—";
 
-        // group_name lo tenías en tu backend de students (si no, queda "—")
         const groupName = student.group_name ?? student.group ?? "—";
 
-        // fee puede no existir aún
         const amount_due = fee?.amount_due ?? 0;
         const status = fee?.status ?? "PENDING";
         const monthly_fee_id = fee?.id ?? null;
 
-        // si tu endpoint /api/monthly-fees/student/:id te devuelve totales, úsalo:
-        // aquí asumimos que fee ya trae balance_due + amount_paid_total (si no, lo calculamos después con pagos)
         const amount_paid_total = fee?.amount_paid_total ?? fee?.amount_paid ?? 0;
         const balance_due =
           fee?.balance_due != null ? fee.balance_due : Math.max(0, Number(amount_due) - Number(amount_paid_total));
@@ -217,6 +219,7 @@ const PaymentManagement = () => {
 
   // ===== pagos =====
   const openAbono = (row) => {
+    if (loading) return;
     if (!row.monthly_fee_id) {
       setToastError("Este estudiante aún no tiene cuota generada para este mes.");
       return;
@@ -230,6 +233,7 @@ const PaymentManagement = () => {
   };
 
   const openPagoTotal = (row) => {
+    if (loading) return;
     if (!row.monthly_fee_id) {
       setToastError("Este estudiante aún no tiene cuota generada para este mes.");
       return;
@@ -288,6 +292,7 @@ const PaymentManagement = () => {
 
       setShowPaymentModal(false);
       setSelectedRow(null);
+      await fetchAll(filterYear, filterMonth);
 
     } catch (e) {
       setToastError(e?.message || "Error registrando pago");
@@ -297,6 +302,7 @@ const PaymentManagement = () => {
   };
 
   const openHistory = async (row) => {
+    if (loading) return;
     if (!row.monthly_fee_id) {
       setToastError("Este estudiante aún no tiene cuota generada para este mes.");
       return;
@@ -325,7 +331,6 @@ const PaymentManagement = () => {
       setGenerateGroupId("");
 
       const st = await monthlyFeeService.getMonthlyFeeStatus();
-      // esperable: { year, month, exists, generated_count, ... } (depende tu back)
       setGenerateStatus(st?.data ?? st);
       setShowGenerateModal(true);
     } catch (e) {
@@ -377,6 +382,7 @@ const PaymentManagement = () => {
       <div className="management-header">
         <div>
           <h2>Control Financiero</h2>
+          <br />
           <p className="header-subtitle">Gestión de cuotas mensuales, pagos y control de cobranza</p>
         </div>
 
@@ -611,16 +617,31 @@ const PaymentManagement = () => {
                         <div className="action-buttons">
                           {Number(row.balance_due) > 0 && (
                             <>
-                              <button className="btn-action btn-abono" onClick={() => openAbono(row)} title="Registrar abono">
+                              <button
+                                className="btn-action btn-abono"
+                                onClick={() => openAbono(row)}
+                                title="Registrar abono"
+                                disabled={loading}
+                              >
                                 💵
                               </button>
-                              <button className="btn-action btn-pago-total" onClick={() => openPagoTotal(row)} title="Pago total">
+                              <button
+                                className="btn-action btn-pago-total"
+                                onClick={() => openPagoTotal(row)}
+                                title="Pago total"
+                                disabled={loading}
+                              >
                                 ✓
                               </button>
                             </>
                           )}
 
-                          <button className="btn-action btn-history" onClick={() => openHistory(row)} title="Ver historial">
+                          <button
+                            className="btn-action btn-history"
+                            onClick={() => openHistory(row)}
+                            title="Ver historial"
+                            disabled={loading}
+                          >
                             📋
                           </button>
                         </div>
@@ -640,7 +661,7 @@ const PaymentManagement = () => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Registrar Pago</h3>
-              <button className="btn-close" onClick={() => setShowPaymentModal(false)}>
+              <button className="btn-close" onClick={() => setShowPaymentModal(false)} disabled={loading}>
                 ✕
               </button>
             </div>
@@ -825,10 +846,6 @@ const PaymentManagement = () => {
                   min="1"
                   placeholder="Ej: 50000"
                 />
-              </div>
-
-              <div style={{ marginTop: 8, opacity: 0.75, fontSize: 12 }}>
-                * Si tu RPC genera una cuota por estudiante activo, este monto será el “amount_due”.
               </div>
             </div>
 

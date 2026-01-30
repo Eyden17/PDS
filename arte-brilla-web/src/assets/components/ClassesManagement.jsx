@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/useAuth";
 import { classService } from "../../services/classService";
 import "../styles/ClassesManagement.css";
 
@@ -36,6 +37,10 @@ function parseTimeRange(range) {
 }
 
 const ClassesManagement = () => {
+  const { user } = useAuth();
+  const role = user?.role || "";
+  const isTeacher = String(role).toUpperCase() === "TEACHER";
+
   const [clases, setClases] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -53,29 +58,31 @@ const ClassesManagement = () => {
 
   const [formData, setFormData] = useState({
     nombre: "",
-    teacher_id: "",            // ✅ ahora guardamos el id real
-    instructor_name: "",       // solo para UI (opcional)
+    teacher_id: "",
+    instructor_name: "",
     group_id: "",
     area: "Babies",
-    horario: "",               // schedule_days (texto)
-    start_time: "",            // ✅ select inicio
-    end_time: "",              // ✅ select fin
+    horario: "",
+    start_time: "",
+    end_time: "",
     capacidad: 15,
     nivel: "Principiante",
     descripcion: "",
     activa: true,
   });
 
-  const areas = ["Babies", "Minies", "Artes Proféticas"];
+  const areas = ["Babies", "Babies Shine", "Minies", "Artes Proféticas"];
   const niveles = ["Principiante", "Intermedio", "Avanzado"];
 
   const colorArea = {
     Babies: "#ec4899",
+    "Babies Shine": "#22d3ee",
     Minies: "#8b5cf6",
     "Artes Proféticas": "#f4a460",
   };
   const iconoArea = {
     Babies: "👶",
+    "Babies Shine": "🌟",
     Minies: "🎀",
     "Artes Proféticas": "✨",
   };
@@ -106,12 +113,14 @@ const ClassesManagement = () => {
       const mapped = (classesRows || []).map((c) => {
         const { start, end } = parseTimeRange(c.schedule_time);
         const teacher = teachersRows.find(t => t.id === c.teacher_id);
+        const rawArea = c.group_name ?? c.group ?? c.area ?? "Babies";
+        const normalizedArea = rawArea === "Baby Shine" ? "Babies Shine" : rawArea;
 
         return {
           id: c.id,
           nombre: c.name ?? "",
           group_id: c.group_id ?? "",
-          area: c.group_name ?? c.group ?? c.area ?? "Babies", // si no tenés group_name, ajustamos luego
+          area: normalizedArea, // normaliza Baby Shine -> Babies Shine
           horario: c.schedule_days ?? "",
           start_time: start,
           end_time: end,
@@ -187,6 +196,7 @@ const ClassesManagement = () => {
   };
 
   const handleEditClase = (clase) => {
+    if (isTeacher) return;
     setFormData({
       nombre: clase.nombre,
       teacher_id: clase.teacher_id || "",
@@ -208,6 +218,7 @@ const ClassesManagement = () => {
   const handleDeleteClase = (clase) => setDeleteModal(clase);
 
   const confirmarDelete = async () => {
+    if (isTeacher) return;
     try {
       setLoading(true);
       await classService.remove(deleteModal.id);
@@ -221,11 +232,13 @@ const ClassesManagement = () => {
   };
 
   const handleCancel = () => {
+    if (isTeacher) return;
     setShowForm(false);
     resetForm();
   };
 
   const handleSaveClase = async () => {
+    if (isTeacher) return;
     if (!formData.nombre.trim() || !formData.horario.trim() || !formData.start_time || !formData.end_time) {
       setToastError("Por favor completa todos los campos obligatorios");
       return;
@@ -303,16 +316,18 @@ const ClassesManagement = () => {
       )}
       <div className="management-header">
         <h2>📚 Gestión de Clases</h2>
-        <button
-          className="btn-add-class"
-          onClick={() => {
-            resetForm();
-            setShowForm(!showForm);
-          }}
-          disabled={loading}
-        >
-          {showForm ? "✕ Cancelar" : "+ Crear Clase"}
-        </button>
+        {!isTeacher && (
+          <button
+            className="btn-add-class"
+            onClick={() => {
+              resetForm();
+              setShowForm(!showForm);
+            }}
+            disabled={loading}
+          >
+            {showForm ? "✕ Cancelar" : "+ Crear Clase"}
+          </button>
+        )}
       </div>
 
       {error && (
@@ -417,7 +432,7 @@ const ClassesManagement = () => {
       </div>
 
       {/* Formulario */}
-      {showForm && (
+      {showForm && !isTeacher && (
         <div className="form-container">
           <form className="classes-form">
             <h3>{editingId ? "Editar Clase" : "Nueva Clase"}</h3>
@@ -580,6 +595,7 @@ const ClassesManagement = () => {
         {clasesFiltradas.length === 0 ? (
           <div className="empty-state">
             <p>📚 {filterBusqueda || filterArea !== "Todas" ? "No se encontraron clases con los filtros aplicados" : "No hay clases creadas aún"}</p>
+            <br />
             <small>Crea tu primera clase para comenzar</small>
           </div>
         ) : (
@@ -627,12 +643,16 @@ const ClassesManagement = () => {
                   👥 Estudiantes
                 </button>
 
-                <button className="btn-edit" onClick={() => handleEditClase(clase)} title="Editar" disabled={loading}>
-                  ✏️ Editar
-                </button>
-                <button className="btn-delete" onClick={() => handleDeleteClase(clase)} title="Eliminar" disabled={loading}>
-                  🗑️ Eliminar
-                </button>
+                {!isTeacher && (
+                  <>
+                    <button className="btn-edit" onClick={() => handleEditClase(clase)} title="Editar" disabled={loading}>
+                      ✏️ Editar
+                    </button>
+                    <button className="btn-delete" onClick={() => handleDeleteClase(clase)} title="Eliminar" disabled={loading}>
+                      🗑️ Eliminar
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           ))
@@ -642,7 +662,7 @@ const ClassesManagement = () => {
 
 
       {/* Modal de Eliminación */}
-      {deleteModal && (
+      {deleteModal && !isTeacher && (
         <div className="modal-overlay delete-modal-overlay">
           <div className="delete-modal">
             <div className="delete-modal-header">

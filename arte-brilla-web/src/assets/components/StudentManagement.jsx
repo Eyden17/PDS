@@ -1,8 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useAuth } from '../../context/useAuth';
 import { studentService } from '../../services/studentService';
 import '../styles/StudentManagement.css';
 
 const StudentManagement = () => {
+  const { user } = useAuth();
+  const role = user?.role || '';
+  const isTeacher = String(role).toUpperCase() === 'TEACHER';
+
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -35,11 +40,13 @@ const StudentManagement = () => {
 
   const grupos = [
     { label: 'Babies (3-5 años)', icon: '👶', color: '#ec4899' },
+    { label: 'Babies Shine (3-5 años)', icon: '🌟', color: '#22d3ee' },
     { label: 'Minies (6+ años)', icon: '🎀', color: '#8b5cf6' },
     { label: 'Artes Proféticas', icon: '✨', color: '#f4a460' }
   ];
   const ageRangesByGroup = {
     'Babies (3-5 años)': { min: 3, max: 5 },
+    'Babies Shine (3-5 años)': { min: 3, max: 5 },
     'Minies (6+ años)': { min: 6, max: 11 },
     'Artes Proféticas': { min: 12, max: null }
   };
@@ -64,6 +71,8 @@ const StudentManagement = () => {
         // convertir group_name ("Babies") a label UI ("Babies (3-5 años)")
         const grupoLabel =
           s.group_name === 'Babies' ? 'Babies (3-5 años)' :
+          s.group_name === 'Babies Shine' ? 'Babies Shine (3-5 años)' :
+          s.group_name === 'Baby Shine' ? 'Babies Shine (3-5 años)' :
           s.group_name === 'Minies' ? 'Minies (6+ años)' :
           s.group_name === 'Artes Proféticas' ? 'Artes Proféticas' :
           '';
@@ -179,6 +188,7 @@ const StudentManagement = () => {
   };
 
   const handleAddStudent = async () => {
+    if (isTeacher) return;
     const validationMessage = validateForm();
     if (validationMessage) {
       setFormError(validationMessage);
@@ -188,6 +198,7 @@ const StudentManagement = () => {
     // UI label -> BD group_name
     const groupName =
       formData.grupo === 'Babies (3-5 años)' ? 'Babies' :
+      formData.grupo === 'Babies Shine (3-5 años)' ? 'Babies Shine' :
       formData.grupo === 'Minies (6+ años)' ? 'Minies' :
       formData.grupo === 'Artes Proféticas' ? 'Artes Proféticas' :
       null;
@@ -289,6 +300,7 @@ const StudentManagement = () => {
 
 
   const handleEditStudent = (student) => {
+    if (isTeacher) return;
     setFormError('');
     setOriginalFormData({
       cedula: student.cedula ?? '',
@@ -321,10 +333,12 @@ const StudentManagement = () => {
 
 
   const handleDeleteStudent = (id) => {
+    if (isTeacher) return;
     setDeleteConfirm(id);
   };
 
   const confirmDeleteStudent = async (id) => {
+    if (isTeacher) return;
     try {
       setLoading(true);
       setError(null);
@@ -342,6 +356,7 @@ const StudentManagement = () => {
 
 
   const handleCancel = () => {
+    if (isTeacher) return;
     setShowForm(false);
     setEditingId(null);
     setFormData({
@@ -407,31 +422,33 @@ const StudentManagement = () => {
           <h2>Gestión de Estudiantes</h2>
           <p className="header-subtitle">Administra información de estudiantes, grupos y expedientes</p>
         </div>
-        <button 
-          className="btn-add-student"
-          onClick={() => {
-            if (showForm) {
-              handleCancel();
-            } else {
-              setEditingId(null);
-              setFormData({
-                cedula: '',
-                nombre: '',
-                apellido: '',
-                segundoApellido: '',
-                edad: '',
-                encargado: '',
-                telefonoEncargado: '',
-                observaciones: '',
-                grupo: '',
-                activo: true
-              });
-              setShowForm(true);
-            }
-          }}
-        >
-          {showForm ? '✕ Cancelar' : '+ Agregar Estudiante'}
-        </button>
+        {!isTeacher && (
+          <button 
+            className="btn-add-student"
+            onClick={() => {
+              if (showForm) {
+                handleCancel();
+              } else {
+                setEditingId(null);
+                setFormData({
+                  cedula: '',
+                  nombre: '',
+                  apellido: '',
+                  segundoApellido: '',
+                  edad: '',
+                  encargado: '',
+                  telefonoEncargado: '',
+                  observaciones: '',
+                  grupo: '',
+                  activo: true
+                });
+                setShowForm(true);
+              }
+            }}
+          >
+            {showForm ? '✕ Cancelar' : '+ Agregar Estudiante'}
+          </button>
+        )}
       </div>
 
       {/* Tarjetas de Estadísticas */}
@@ -456,7 +473,7 @@ const StudentManagement = () => {
       </div>
 
       {/* Formulario */}
-      {showForm && (
+      {showForm && !isTeacher && (
         <div className="form-container">
           <h3 className="form-title">{editingId ? 'Editar Estudiante' : 'Nuevo Estudiante'}</h3>
           <form className="student-form">
@@ -529,6 +546,7 @@ const StudentManagement = () => {
                 >
                   <option value="">Seleccionar grupo</option>
                   <option value="Babies (3-5 años)">Babies (3-5 años)</option>
+                  <option value="Babies Shine (3-5 años)">Babies Shine (3-5 años)</option>
                   <option value="Minies (6+ años)">Minies (6+ años)</option>
                   <option value="Artes Proféticas">Artes Proféticas</option>
                 </select>
@@ -617,6 +635,7 @@ const StudentManagement = () => {
             <select value={filterGroup} onChange={(e) => setFilterGroup(e.target.value)}>
               <option value="">Todos los grupos</option>
               <option value="Babies (3-5 años)">Babies (3-5 años)</option>
+              <option value="Babies Shine (3-5 años)">Babies Shine (3-5 años)</option>
               <option value="Minies (6+ años)">Minies (6+ años)</option>
               <option value="Artes Proféticas">Artes Proféticas</option>
             </select>
@@ -724,22 +743,24 @@ const StudentManagement = () => {
                     <span className="obs-text">{student.observaciones || '-'}</span>
                   </td>
                   <td className="col-actions">
-                    <div className="action-buttons">
-                      <button
-                        className="btn-action btn-edit"
-                        onClick={() => handleEditStudent(student)}
-                        title="Editar"
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        className="btn-action btn-delete"
-                        onClick={() => handleDeleteStudent(student.id)}
-                        title="Eliminar"
-                      >
-                        🗑️
-                      </button>
-                    </div>
+                    {!isTeacher && (
+                      <div className="action-buttons">
+                        <button
+                          className="btn-action btn-edit"
+                          onClick={() => handleEditStudent(student)}
+                          title="Editar"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          className="btn-action btn-delete"
+                          onClick={() => handleDeleteStudent(student.id)}
+                          title="Eliminar"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -753,7 +774,7 @@ const StudentManagement = () => {
       </div>
 
       {/* Modal de Confirmación para Eliminar */}
-      {deleteConfirm && (
+      {deleteConfirm && !isTeacher && (
         <div className="modal-overlay delete-modal-overlay">
           <div className="delete-modal">
             <div className="delete-modal-header">

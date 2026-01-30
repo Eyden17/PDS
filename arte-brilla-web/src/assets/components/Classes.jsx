@@ -14,12 +14,15 @@ function Classes() {
 
   const areas = [
     { id: 'Babies', label: 'Arte Brilla Babys', color: '#ec4899', icon: '👶', description: '3-5 años' },
-    { id: 'Baby Shine', label: 'Baby Shine', color: '#22d3ee', icon: '🌟', description: '4-6 años' },
+    { id: 'Babies Shine', label: 'Babies Shine', color: '#22d3ee', icon: '🌟', description: '3-5 años' },
     { id: 'Minies', label: 'Arte Brilla Minis', color: '#8b5cf6', icon: '🎀', description: '6+ años' },
     { id: 'Artes Proféticas', label: 'Arte Profética Brilla', color: '#f4a460', icon: '✨', description: 'Todas las edades' }
   ];
 
   const getClassesByArea = (areaId) => {
+    if (areaId === 'Babies Shine') {
+      return classes.filter(clase => clase.group_name === 'Babies Shine' || clase.group_name === 'Baby Shine');
+    }
     return classes.filter(clase => clase.group_name === areaId);
   };
 
@@ -91,17 +94,17 @@ function Classes() {
                     ></div>
                     <div className="class-content">
                       <h4>{clase.name}</h4>
-                      <p className="class-instructor">👨‍🏫 {clase.instructor}</p>
+                      <p className="class-instructor">👨‍🏫 {clase.teacher_name}</p>
                       <p className="class-level">📚 {clase.level}</p>
                     </div>
                   </div>
 
                   <div className="class-details">
                     <span className="detail-item">
-                      <strong>📅</strong> {clase.schedule}
+                      <strong>📅</strong> {clase.schedule_days}
                     </span>
                     <span className="detail-item">
-                      <strong>⏰</strong> {clase.time}
+                      <strong>⏰</strong> {clase.schedule_time}
                     </span>
                     <span className="detail-item">
                       <strong>👥</strong> {clase.capacity}

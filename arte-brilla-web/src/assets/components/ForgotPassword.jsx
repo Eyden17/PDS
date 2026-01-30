@@ -21,7 +21,7 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      await authService.forgotPassword(email);
+      await authService.requestPasswordResetOtp(email);
       setMessage('Se ha enviado un código de recuperación a tu correo. Por favor revisa tu bandeja de entrada.');
       setStep(2);
     } catch (e) {
@@ -38,7 +38,7 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      await authService.verifyCode(email, code);
+      await authService.verifyPasswordResetOtp(email, code);
       setMessage('Código verificado correctamente. Ahora puedes crear una nueva contraseña.');
       setStep(3);
     } catch (e) {
@@ -66,7 +66,7 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      await authService.resetPassword(email, code, newPassword);
+      await authService.resetPasswordWithOtp(email, code, newPassword);
       setMessage('Contraseña actualizada correctamente. Redirigiendo al login...');
       setTimeout(() => {
         navigate('/login');

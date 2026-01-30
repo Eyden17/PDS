@@ -4,6 +4,7 @@ import '../styles/Contact.css';
 
 function Contact() {
   const form = useRef();
+  const toastTimer = useRef(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,11 +15,28 @@ function Contact() {
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [toastError, setToastError] = useState('');
 
-  // ✅ Inicializar EmailJS una sola vez al montar el componente
+  // Inicializar EmailJS una sola vez al montar el componente
   useEffect(() => {
     emailjs.init(import.meta.env.VITE_PUBLIC_KEY);
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimer.current) {
+        clearTimeout(toastTimer.current);
+      }
+    };
+  }, []);
+
+  const showToastError = (message) => {
+    setToastError(message);
+    if (toastTimer.current) {
+      clearTimeout(toastTimer.current);
+    }
+    toastTimer.current = setTimeout(() => setToastError(''), 4500);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,12 +64,8 @@ function Contact() {
       await emailjs.sendForm(
         import.meta.env.VITE_SERVICE_ID,
         import.meta.env.VITE_TEMPLATE_ID,
-        
         form.current,
         import.meta.env.VITE_PUBLIC_KEY
-     
-     
-     
       );
 
       setIsSubmitted(true);
@@ -65,7 +79,7 @@ function Contact() {
 
     } catch (error) {
       console.error('Error:', error);
-      alert('Hubo un problema al enviar tu mensaje. Inténtalo de nuevo.');
+      showToastError(error?.message || 'Hubo un problema al enviar tu mensaje. Inténtalo de nuevo.');
     } finally {
       setIsLoading(false);
     }
@@ -188,6 +202,11 @@ function Contact() {
                 <p className="success-message">Gracias por tu mensaje. Nos pondremos en contacto pronto.</p>
               )}
             </form>
+            {toastError && (
+              <div className="toast-stack" role="status" aria-live="polite">
+                <div className="toast-error">{toastError}</div>
+              </div>
+            )}
           </div>
         </div>
       </div>
