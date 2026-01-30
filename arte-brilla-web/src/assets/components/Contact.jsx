@@ -46,7 +46,8 @@ function Contact() {
       await emailjs.sendForm(
         import.meta.env.VITE_SERVICE_ID,
         import.meta.env.VITE_TEMPLATE_ID,
-        form.current
+        form.current,
+        import.meta.env.VITE_PUBLIC_KEY
       );
 
       setIsSubmitted(true);
