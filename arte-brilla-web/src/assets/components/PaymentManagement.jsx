@@ -141,16 +141,12 @@ const PaymentManagement = () => {
         const last = student.last_name ?? "";
         const fullName = `${first} ${last}`.trim() || "—";
 
-        // group_name lo tenías en tu backend de students (si no, queda "—")
         const groupName = student.group_name ?? student.group ?? "—";
 
-        // fee puede no existir aún
         const amount_due = fee?.amount_due ?? 0;
         const status = fee?.status ?? "PENDING";
         const monthly_fee_id = fee?.id ?? null;
 
-        // si tu endpoint /api/monthly-fees/student/:id te devuelve totales, úsalo:
-        // aquí asumimos que fee ya trae balance_due + amount_paid_total (si no, lo calculamos después con pagos)
         const amount_paid_total = fee?.amount_paid_total ?? fee?.amount_paid ?? 0;
         const balance_due =
           fee?.balance_due != null ? fee.balance_due : Math.max(0, Number(amount_due) - Number(amount_paid_total));
@@ -342,7 +338,6 @@ const PaymentManagement = () => {
       setGenerateGroupId("");
 
       const st = await monthlyFeeService.getMonthlyFeeStatus();
-      // esperable: { year, month, exists, generated_count, ... } (depende tu back)
       setGenerateStatus(st?.data ?? st);
       setShowGenerateModal(true);
     } catch (e) {
