@@ -55,7 +55,7 @@ const Navbar = () => {
           <li><Link to="/contact" className={`nav-link ${location.pathname === '/contact' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Contacto</Link></li>
           {enableAdmin && isAuthenticated && (
             <li className="nav-button-wrapper">
-              <Link to="/admin" className={`nav-button ${location.pathname === '/admin' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Panel Admin</Link>
+              <Link to="/dashboard" className={`nav-button ${location.pathname === '/dashboard' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Panel Admin</Link>
             </li>
           )}
           {enableAdmin && isAuthenticated && (

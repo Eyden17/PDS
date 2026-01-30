@@ -18,9 +18,8 @@ const Hero = () => {
       <div className="hero-content">
       {/* Título principal */}
       <h1 className="main-title">
-        La danza expresa <br />
-        <span className="highlight">el gozo de tu</span>
-        <span className="highlight">corazón</span>
+        La danza transmite <br />
+        <span className="highlight">el ritmo que hay dentro de ti</span>
       </h1>
 
       <div className="hero-underline"></div>

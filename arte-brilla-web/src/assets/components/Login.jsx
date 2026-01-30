@@ -33,7 +33,7 @@ const Login = () => {
     const result = await login(email, password);
 
     if (result.success) {
-      const destination = (result.role === 'OWNER' || result.role === 'ADMIN') ? '/admin' : '/teacher';
+      const destination = (result.role === 'OWNER' || result.role === 'ADMIN') ? '/dashboard' : '/teacher';
       navigate(destination, { replace: true });
     } else {
       setError(result.message || 'Credenciales inválidas o error de conexión');

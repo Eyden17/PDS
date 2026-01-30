@@ -7,6 +7,7 @@ const NewsManagement = () => {
   const [news, setNews] = useState([]); // ✅ ahora viene del API
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [toastError, setToastError] = useState('');
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -34,14 +35,15 @@ const NewsManagement = () => {
     taller: '#9b59b6',
     otro: '#34495e'
   };
-
   const iconoCategoria = {
-    anuncio: '📢',
-    recital: '🎉',
-    presentación: '🏆',
-    taller: '📚',
-    otro: '📚'
+    anuncio: 'fa-bullhorn',
+    recital: 'fa-microphone-lines',
+    presentación: 'fa-trophy',
+    taller: 'fa-chalkboard-user',
+    otro: 'fa-layer-group'
   };
+  const getCategoryIcon = (cat) =>
+    iconoCategoria[(cat || '').toLowerCase()] || 'fa-layer-group';
 
   // =========================
   // Helpers: categoría UI <-> DB
@@ -163,7 +165,7 @@ const NewsManagement = () => {
   // =========================
   const handleAddNews = async () => {
     if (!formData.titulo?.trim() || !formData.contenido?.trim()) {
-      alert('Campos obligatorios');
+      setToastError('Completa los campos obligatorios.');
       return;
     }
 
@@ -232,7 +234,7 @@ const NewsManagement = () => {
       setShowForm(false);
       await fetchNews();
     } catch (err) {
-      alert(err.message || 'Error al guardar');
+      setToastError(err.message || 'Error al guardar');
     }
   };
 
@@ -267,7 +269,7 @@ const NewsManagement = () => {
       setDeleteModal(null);
       await fetchNews();
     } catch (err) {
-      alert(err.message || 'Error al eliminar la noticia');
+      setToastError(err.message || 'Error al eliminar la noticia');
     }
   };
 
@@ -302,6 +304,12 @@ const NewsManagement = () => {
 
   return (
     <div className="news-management">
+      {(toastError || error) && (
+        <div className="toast-stack" role="status" aria-live="polite">
+          {toastError && <div className="toast-error">{toastError}</div>}
+          {error && <div className="toast-error">{error}</div>}
+        </div>
+      )}
       <div className="management-header">
         <h2>📰 Gestión de Noticias</h2>
         <button
@@ -318,13 +326,19 @@ const NewsManagement = () => {
 
       {/* Mensaje de error/cargando sin romper diseño */}
       {error && (
-        <div className="empty-state">
-          <p>⚠️ {error}</p>
+        <div className="empty-state error-state">
+          <p>
+            <i className="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+            <span>{error}</span>
+          </p>
         </div>
       )}
       {loading && (
         <div className="empty-state">
-          <p>⏳ Cargando...</p>
+          <p>
+            <i className="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+            <span>Cargando...</span>
+          </p>
         </div>
       )}
 
@@ -346,7 +360,9 @@ const NewsManagement = () => {
         </div>
         {Object.entries(categoriaStats).map(([cat, count]) => (
           <div key={cat} className="stat-card">
-            <div className="stat-icon" style={{ fontSize: '20px' }}>{iconoCategoria[cat]}</div>
+            <div className="stat-icon">
+              <i className={`fa-solid ${getCategoryIcon(cat)}`} aria-hidden="true"></i>
+            </div>
             <div className="stat-content">
               <div className="stat-label">{cat}</div>
               <div className="stat-value">{count}</div>
@@ -391,7 +407,7 @@ const NewsManagement = () => {
             >
               <option value="Todas">Todas las categorías</option>
               {categorias.map(cat => (
-                <option key={cat} value={cat}>{iconoCategoria[cat]} {cat}</option>
+                <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
           </div>
@@ -581,7 +597,8 @@ const NewsManagement = () => {
                     className="category-badge"
                     style={{ backgroundColor: colorCategoria[newsItem.categoria] }}
                   >
-                    {iconoCategoria[newsItem.categoria]} {newsItem.categoria}
+                    <i className={`fa-solid ${getCategoryIcon(newsItem.categoria)}`} aria-hidden="true"></i>
+                    {newsItem.categoria}
                   </span>
                 </div>
               )}
@@ -645,7 +662,8 @@ const NewsManagement = () => {
                     className="category-badge-small"
                     style={{ backgroundColor: colorCategoria[deleteModal.categoria] }}
                   >
-                    {iconoCategoria[deleteModal.categoria]} {deleteModal.categoria}
+                    <i className={`fa-solid ${getCategoryIcon(deleteModal.categoria)}`} aria-hidden="true"></i>
+                    {deleteModal.categoria}
                   </span>
                 </div>
               </div>
@@ -675,3 +693,8 @@ const NewsManagement = () => {
 };
 
 export default NewsManagement;
+
+
+
+
+

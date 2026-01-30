@@ -159,6 +159,11 @@ const ReportManagement = () => {
   return (
     <>
       <div className="report-management" ref={reportRef}>
+        {(error) && (
+          <div className="toast-stack" role="status" aria-live="polite">
+            <div className="toast-error">{error}</div>
+          </div>
+        )}
         <div className="report-header">
           <img src={logo} alt="Arte Brilla" className="report-logo" />
           <h2>Reporte de Cobranza</h2>
@@ -210,8 +215,8 @@ const ReportManagement = () => {
         </div>
 
         {/* estados */}
-        {loading && <div className="empty-state"><p>⏳ Cargando reporte...</p></div>}
-        {!loading && error && <div className="empty-state"><p>⚠️ {error}</p></div>}
+        {loading && <div className="empty-state"><p>\n              <i className="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>\n              <span>Cargando reporte...</span>\n            </p></div>}
+        {!loading && error && <div className="empty-state error-state"><p>\n              <i className="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>\n              <span>{error}</span>\n            </p></div>}
 
         {!loading && !error && (
           <>
@@ -350,3 +355,8 @@ const ReportManagement = () => {
 };
 
 export default ReportManagement;
+
+
+
+
+

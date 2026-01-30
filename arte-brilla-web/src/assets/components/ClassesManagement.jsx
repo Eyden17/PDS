@@ -43,6 +43,7 @@ const ClassesManagement = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [toastError, setToastError] = useState("");
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -213,7 +214,7 @@ const ClassesManagement = () => {
       setDeleteModal(null);
       await fetchAll();
     } catch (e) {
-      alert(e?.message || "Error al eliminar la clase");
+      setToastError(e?.message || "Error al eliminar la clase");
     } finally {
       setLoading(false);
     }
@@ -226,12 +227,12 @@ const ClassesManagement = () => {
 
   const handleSaveClase = async () => {
     if (!formData.nombre.trim() || !formData.horario.trim() || !formData.start_time || !formData.end_time) {
-      alert("Por favor completa todos los campos obligatorios");
+      setToastError("Por favor completa todos los campos obligatorios");
       return;
     }
 
     if (formData.start_time >= formData.end_time) {
-      alert("La hora de inicio debe ser menor que la hora de fin");
+      setToastError("La hora de inicio debe ser menor que la hora de fin");
       return;
     }
 
@@ -261,7 +262,7 @@ const ClassesManagement = () => {
       setShowForm(false);
       await fetchAll();
     } catch (e) {
-      alert(e?.message || "Error al guardar");
+      setToastError(e?.message || "Error al guardar");
     } finally {
       setLoading(false);
     }
@@ -294,6 +295,12 @@ const ClassesManagement = () => {
   // ============
   return (
     <div className="classes-management">
+      {(toastError || error) && (
+        <div className="toast-stack" role="status" aria-live="polite">
+          {toastError && <div className="toast-error">{toastError}</div>}
+          {error && <div className="toast-error">{error}</div>}
+        </div>
+      )}
       <div className="management-header">
         <h2>📚 Gestión de Clases</h2>
         <button
@@ -309,13 +316,19 @@ const ClassesManagement = () => {
       </div>
 
       {error && (
-        <div className="empty-state">
-          <p>⚠️ {error}</p>
+        <div className="empty-state error-state">
+          <p>
+            <i className="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+            <span>{error}</span>
+          </p>
         </div>
       )}
       {loading && (
         <div className="empty-state">
-          <p>⏳ Cargando...</p>
+          <p>
+            <i className="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+            <span>Cargando...</span>
+          </p>
         </div>
       )}
 
@@ -664,3 +677,5 @@ const ClassesManagement = () => {
 };
 
 export default ClassesManagement;
+
+

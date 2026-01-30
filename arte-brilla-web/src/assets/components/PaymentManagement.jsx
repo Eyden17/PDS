@@ -30,6 +30,7 @@ const PaymentManagement = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [toastError, setToastError] = useState("");
 
   // ===== filtros UI =====
   const now = new Date();
@@ -224,7 +225,7 @@ const PaymentManagement = () => {
   // ===== pagos =====
   const openAbono = (row) => {
     if (!row.monthly_fee_id) {
-      alert("Este estudiante aún no tiene cuota generada para este mes.");
+      setToastError("Este estudiante aún no tiene cuota generada para este mes.");
       return;
     }
     setSelectedRow(row);
@@ -237,7 +238,7 @@ const PaymentManagement = () => {
 
   const openPagoTotal = (row) => {
     if (!row.monthly_fee_id) {
-      alert("Este estudiante aún no tiene cuota generada para este mes.");
+      setToastError("Este estudiante aún no tiene cuota generada para este mes.");
       return;
     }
     setSelectedRow(row);
@@ -252,10 +253,13 @@ const PaymentManagement = () => {
     try {
       const monto = Number(paymentAmount || 0);
       if (!selectedRow?.monthly_fee_id) return;
-      if (!Number.isFinite(monto) || monto <= 0) return;
+      if (!Number.isFinite(monto) || monto <= 0) {
+        setToastError("Ingresa un monto válido mayor a 0.");
+        return;
+      }
 
       if (monto > Number(selectedRow.balance_due || 0)) {
-        alert("El abono no puede exceder el saldo.");
+        setToastError("El abono no puede exceder el saldo.");
         return;
       }
 
@@ -293,7 +297,7 @@ const PaymentManagement = () => {
       setSelectedRow(null);
 
     } catch (e) {
-      alert(e?.message || "Error registrando pago");
+      setToastError(e?.message || "Error registrando pago");
     } finally {
       setLoading(false);
     }
@@ -301,7 +305,7 @@ const PaymentManagement = () => {
 
   const openHistory = async (row) => {
     if (!row.monthly_fee_id) {
-      alert("Este estudiante aún no tiene cuota generada para este mes.");
+      setToastError("Este estudiante aún no tiene cuota generada para este mes.");
       return;
     }
     try {
@@ -313,7 +317,7 @@ const PaymentManagement = () => {
       const rows = res?.data ?? res ?? [];
       setHistoryPayments(rows);
     } catch (e) {
-      alert(e?.message || "Error cargando historial");
+      setToastError(e?.message || "Error cargando historial");
       setHistoryOpenId(null);
     } finally {
       setHistoryLoading(false);
@@ -332,7 +336,7 @@ const PaymentManagement = () => {
       setGenerateStatus(st?.data ?? st);
       setShowGenerateModal(true);
     } catch (e) {
-      alert(e?.message || "Error consultando estado de mensualidades");
+      setToastError(e?.message || "Error consultando estado de mensualidades");
     } finally {
       setGenerateLoading(false);
     }
@@ -342,11 +346,11 @@ const PaymentManagement = () => {
     try {
       const amount = Number(generateAmount || 0);
       if (!Number.isFinite(amount) || amount <= 0) {
-        alert("Ingresa un monto válido (> 0).");
+        setToastError("Ingresa un monto válido (> 0).");
         return;
       }
       if (!generateGroupId) {
-        alert("Selecciona un grupo para generar la cuota.");
+        setToastError("Selecciona un grupo para generar la cuota.");
         return;
       }
 
@@ -362,7 +366,7 @@ const PaymentManagement = () => {
       setShowGenerateModal(false);
       await fetchAll(filterYear, filterMonth);
     } catch (e) {
-      alert(e?.message || "Error generando cuotas");
+      setToastError(e?.message || "Error generando cuotas");
     } finally {
       setGenerateLoading(false);
     }
@@ -371,6 +375,12 @@ const PaymentManagement = () => {
   // ===== UI =====
   return (
     <div className="payment-management">
+      {(error || toastError) && (
+        <div className="toast-stack" role="status" aria-live="polite">
+          {toastError && <div className="toast-error">{toastError}</div>}
+          {error && <div className="toast-error">{error}</div>}
+        </div>
+      )}
       <div className="management-header">
         <div>
           <h2>Control Financiero</h2>
@@ -383,13 +393,19 @@ const PaymentManagement = () => {
       </div>
 
       {error && (
-        <div className="empty-state">
-          <p>⚠️ {error}</p>
+        <div className="empty-state error-state">
+          <p>
+            <i className="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+            <span>{error}</span>
+          </p>
         </div>
       )}
       {loading && (
         <div className="empty-state">
-          <p>⏳ Cargando...</p>
+          <p>
+            <i className="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+            <span>Cargando...</span>
+          </p>
         </div>
       )}
 
@@ -899,3 +915,4 @@ const PaymentManagement = () => {
 };
 
 export default PaymentManagement;
+

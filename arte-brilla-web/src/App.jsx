@@ -57,7 +57,7 @@ function App() {
               )}
               {enableAdmin && (
                 <Route
-                  path="/admin"
+                  path="/dashboard/*"
                   element={
                     <ProtectedRoute>
                       <AdminPanel />
@@ -67,7 +67,7 @@ function App() {
               )}
               {enableAdmin && (
                 <Route
-                  path="/admin/*"
+                  path="/dashboard/*"
                   element={
                     <ProtectedRoute>
                       <AdminPanel />

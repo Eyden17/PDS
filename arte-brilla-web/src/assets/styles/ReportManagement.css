@@ -9,6 +9,40 @@
   min-height: 100vh;
 }
 
+.toast-stack {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.toast-error {
+  padding: 14px 18px;
+  background-color: #fff4f4;
+  border-left: 5px solid #e55;
+  color: #b22222;
+  border-radius: 8px;
+  font-size: 14px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  animation: toastSlideInRight 0.35s ease-out;
+  max-width: min(360px, 80vw);
+}
+
+@keyframes toastSlideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 /* Contenedor PDF Oculto - CORREGIDO */
 
 /* Header */
@@ -95,6 +129,21 @@
 .btn-reset-filters:hover {
   background: #e0e0e0;
   border-color: #999;
+}
+
+.empty-state p {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.error-state p {
+  color: #b22222;
+  font-weight: 600;
+}
+
+.error-state i {
+  font-size: 16px;
 }
 
 

@@ -94,7 +94,7 @@ export default function ClassStudentsPage() {
       console.log("Payload to send:", ids);
       await classService.saveStudents(classId, ids);
 
-      navigate("/admin?section=classes");
+      navigate("/dashboard?section=classes");
     } catch (e) {
       setError(e?.message || "Error guardando");
     } finally {
@@ -108,7 +108,7 @@ export default function ClassStudentsPage() {
         <h2>👥 Estudiantes de la clase</h2>
 
         <div style={{ display: "flex", gap: 8 }}>
-          <button className="btn-cancel" onClick={() => navigate("/admin?section=classes")} disabled={saving || loading}>
+          <button className="btn-cancel" onClick={() => navigate("/dashboard?section=classes")} disabled={saving || loading}>
             ✕ Cancelar
           </button>
           <button className="btn-submit" onClick={onSave} disabled={saving || loading}>

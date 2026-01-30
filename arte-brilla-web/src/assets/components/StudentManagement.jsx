@@ -38,6 +38,11 @@ const StudentManagement = () => {
     { label: 'Minies (6+ años)', icon: '🎀', color: '#8b5cf6' },
     { label: 'Artes Proféticas', icon: '✨', color: '#f4a460' }
   ];
+  const ageRangesByGroup = {
+    'Babies (3-5 años)': { min: 3, max: 5 },
+    'Minies (6+ años)': { min: 6, max: 11 },
+    'Artes Proféticas': { min: 12, max: null }
+  };
 
   const fetchStudents = async () => {
     try {
@@ -135,6 +140,18 @@ const StudentManagement = () => {
       const edad = Number(formData.edad);
       if (!Number.isFinite(edad) || edad < 3) {
         return 'La edad debe ser 3 o mayor.';
+      }
+
+      if (formData.grupo) {
+        const range = ageRangesByGroup[formData.grupo];
+        if (range) {
+          if (edad < range.min) {
+            return `Para el grupo seleccionado, la edad debe ser ${range.min} o mayor.`;
+          }
+          if (range.max != null && edad > range.max) {
+            return `Para el grupo seleccionado, la edad debe estar entre ${range.min} y ${range.max}.`;
+          }
+        }
       }
     }
 
@@ -379,6 +396,12 @@ const StudentManagement = () => {
 
   return (
     <div className="student-management">
+      {(formError || error) && (
+        <div className="toast-stack" role="status" aria-live="polite">
+          {formError && <div className="toast-error">{formError}</div>}
+          {error && <div className="toast-error">{error}</div>}
+        </div>
+      )}
       <div className="management-header">
         <div className="header-content">
           <h2>Gestión de Estudiantes</h2>
@@ -437,7 +460,6 @@ const StudentManagement = () => {
         <div className="form-container">
           <h3 className="form-title">{editingId ? 'Editar Estudiante' : 'Nuevo Estudiante'}</h3>
           <form className="student-form">
-            {formError && <div className="form-error">{formError}</div>}
             <div className="form-row">
               <div className="form-group">
                 <label>Cédula *</label>
@@ -639,13 +661,19 @@ const StudentManagement = () => {
 
         {loading && (
           <div className="empty-state">
-            <p>⏳ Cargando estudiantes...</p>
+            <p>
+              <i className="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+              <span>Cargando estudiantes...</span>
+            </p>
           </div>
         )}
 
         {!loading && error && (
-          <div className="empty-state">
-            <p>⚠️ {error}</p>
+          <div className="empty-state error-state">
+            <p>
+              <i className="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+              <span>{error}</span>
+            </p>
           </div>
         )}
 
@@ -773,3 +801,5 @@ const StudentManagement = () => {
 };
 
 export default StudentManagement;
+
+
