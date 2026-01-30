@@ -19,8 +19,8 @@ const DanceAreas = () => {
     },
     {
       id: 2,
-      title: 'Baby Shine',
-      ageRange: '4 - 7 años',
+      title: 'Babies Shine',
+      ageRange: '3 - 5 años',
       description: 'Metodología lúdica para técnica básica y confianza escénica.',
       icon: '🌟',
       color: 'purple'

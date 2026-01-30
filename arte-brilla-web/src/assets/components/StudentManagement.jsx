@@ -40,11 +40,13 @@ const StudentManagement = () => {
 
   const grupos = [
     { label: 'Babies (3-5 años)', icon: '👶', color: '#ec4899' },
+    { label: 'Babies Shine (3-5 años)', icon: '🌟', color: '#22d3ee' },
     { label: 'Minies (6+ años)', icon: '🎀', color: '#8b5cf6' },
     { label: 'Artes Proféticas', icon: '✨', color: '#f4a460' }
   ];
   const ageRangesByGroup = {
     'Babies (3-5 años)': { min: 3, max: 5 },
+    'Babies Shine (3-5 años)': { min: 3, max: 5 },
     'Minies (6+ años)': { min: 6, max: 11 },
     'Artes Proféticas': { min: 12, max: null }
   };
@@ -69,6 +71,8 @@ const StudentManagement = () => {
         // convertir group_name ("Babies") a label UI ("Babies (3-5 años)")
         const grupoLabel =
           s.group_name === 'Babies' ? 'Babies (3-5 años)' :
+          s.group_name === 'Babies Shine' ? 'Babies Shine (3-5 años)' :
+          s.group_name === 'Baby Shine' ? 'Babies Shine (3-5 años)' :
           s.group_name === 'Minies' ? 'Minies (6+ años)' :
           s.group_name === 'Artes Proféticas' ? 'Artes Proféticas' :
           '';
@@ -194,6 +198,7 @@ const StudentManagement = () => {
     // UI label -> BD group_name
     const groupName =
       formData.grupo === 'Babies (3-5 años)' ? 'Babies' :
+      formData.grupo === 'Babies Shine (3-5 años)' ? 'Babies Shine' :
       formData.grupo === 'Minies (6+ años)' ? 'Minies' :
       formData.grupo === 'Artes Proféticas' ? 'Artes Proféticas' :
       null;
@@ -541,6 +546,7 @@ const StudentManagement = () => {
                 >
                   <option value="">Seleccionar grupo</option>
                   <option value="Babies (3-5 años)">Babies (3-5 años)</option>
+                  <option value="Babies Shine (3-5 años)">Babies Shine (3-5 años)</option>
                   <option value="Minies (6+ años)">Minies (6+ años)</option>
                   <option value="Artes Proféticas">Artes Proféticas</option>
                 </select>
@@ -629,6 +635,7 @@ const StudentManagement = () => {
             <select value={filterGroup} onChange={(e) => setFilterGroup(e.target.value)}>
               <option value="">Todos los grupos</option>
               <option value="Babies (3-5 años)">Babies (3-5 años)</option>
+              <option value="Babies Shine (3-5 años)">Babies Shine (3-5 años)</option>
               <option value="Minies (6+ años)">Minies (6+ años)</option>
               <option value="Artes Proféticas">Artes Proféticas</option>
             </select>

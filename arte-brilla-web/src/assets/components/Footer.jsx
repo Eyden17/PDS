@@ -54,7 +54,7 @@ const Footer = () => {
               <h4>Áreas</h4>
               <ul className="footer-links">
                 <li><Link to="/classes">Arte Brilla Babys</Link></li>
-                <li><Link to="/classes">Baby Shine</Link></li>
+                <li><Link to="/classes">Babies Shine</Link></li>
                 <li><Link to="/classes">Arte Brilla Minis</Link></li>
                 <li><Link to="/classes">Arte Profética Brilla</Link></li>
               </ul>

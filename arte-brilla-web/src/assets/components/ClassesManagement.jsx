@@ -71,16 +71,18 @@ const ClassesManagement = () => {
     activa: true,
   });
 
-  const areas = ["Babies", "Minies", "Artes Proféticas"];
+  const areas = ["Babies", "Babies Shine", "Minies", "Artes Proféticas"];
   const niveles = ["Principiante", "Intermedio", "Avanzado"];
 
   const colorArea = {
     Babies: "#ec4899",
+    "Babies Shine": "#22d3ee",
     Minies: "#8b5cf6",
     "Artes Proféticas": "#f4a460",
   };
   const iconoArea = {
     Babies: "👶",
+    "Babies Shine": "🌟",
     Minies: "🎀",
     "Artes Proféticas": "✨",
   };
@@ -111,12 +113,14 @@ const ClassesManagement = () => {
       const mapped = (classesRows || []).map((c) => {
         const { start, end } = parseTimeRange(c.schedule_time);
         const teacher = teachersRows.find(t => t.id === c.teacher_id);
+        const rawArea = c.group_name ?? c.group ?? c.area ?? "Babies";
+        const normalizedArea = rawArea === "Baby Shine" ? "Babies Shine" : rawArea;
 
         return {
           id: c.id,
           nombre: c.name ?? "",
           group_id: c.group_id ?? "",
-          area: c.group_name ?? c.group ?? c.area ?? "Babies", // si no tenés group_name, ajustamos luego
+          area: normalizedArea, // normaliza Baby Shine -> Babies Shine
           horario: c.schedule_days ?? "",
           start_time: start,
           end_time: end,

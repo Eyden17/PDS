@@ -25,6 +25,7 @@ const ReportManagement = () => {
   // catálogo UI (labels)
   const grupos = useMemo(() => ({
     'Babies (3-5 años)': { color: '#ec4899' },
+    'Babies Shine (3-5 años)': { color: '#22d3ee' },
     'Minies (6+ años)': { color: '#8b5cf6' },
     'Artes Proféticas': { color: '#f4a460' }
   }), []);
@@ -32,6 +33,7 @@ const ReportManagement = () => {
   // helpers label <-> BD
   const uiGroupToDb = (ui) => {
     if (ui === 'Babies (3-5 años)') return 'Babies';
+    if (ui === 'Babies Shine (3-5 años)') return 'Babies Shine';
     if (ui === 'Minies (6+ años)') return 'Minies';
     if (ui === 'Artes Proféticas') return 'Artes Proféticas';
     return null;
@@ -39,6 +41,7 @@ const ReportManagement = () => {
 
   const dbGroupToUi = (db) => {
     if (db === 'Babies') return 'Babies (3-5 años)';
+    if (db === 'Babies Shine' || db === 'Baby Shine') return 'Babies Shine (3-5 años)';
     if (db === 'Minies') return 'Minies (6+ años)';
     if (db === 'Artes Proféticas') return 'Artes Proféticas';
     return db || '';
