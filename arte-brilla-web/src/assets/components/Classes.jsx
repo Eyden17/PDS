@@ -20,7 +20,7 @@ function Classes() {
     { id: 'Babies', label: 'Arte Brilla Babys', color: '#ec4899', icon: '👶', description: '3-5 años' },
     { id: 'Baby Shine', label: 'Baby Shine', color: '#22d3ee', icon: '🌟', description: '4-6 años' },
     { id: 'Minies', label: 'Arte Brilla Minis', color: '#8b5cf6', icon: '🎀', description: '6+ años' },
-    { id: 'Arte Profética', label: 'Arte Profética Brilla', color: '#f4a460', icon: '✨', description: 'Todas las edades' }
+    { id: 'Artes Proféticas', label: 'Arte Profética Brilla', color: '#f4a460', icon: '✨', description: 'Todas las edades' }
   ];
 
   const getClassesByArea = (areaId) => {
