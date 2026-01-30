@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { classesData } from '../../data/classesData';
 import { classService } from '../../services/classService';
 import '../styles/Classes.css';
 
 function Classes() {
   const [classes, setClasses] = useState([]);
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     classService.listPublic()
       .then(data => setClasses(data))
-      .catch(err => console.error(err))
-      .finally(() => setLoading(false));
+      .catch(err => console.error(err));
   }, []);
 
   const [selectedArea, setSelectedArea] = useState(null);
@@ -117,8 +113,9 @@ function Classes() {
                   <button 
                     className="class-action-btn"
                     style={{ backgroundColor: clase.color }}
+                    onClick={() => { window.location.href = '/contact'; }}
                   >
-                    Inscribirse
+                    Más información
                   </button>
                 </div>
               ))}

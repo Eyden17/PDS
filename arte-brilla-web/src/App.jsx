@@ -6,6 +6,7 @@ import ScreenSizeWarning from './assets/components/ScreenSizeWarning.jsx';
 import Hero from './assets/components/Hero';
 import NewsGallery from './assets/components/NewsGallery';
 import DanceAreas from './assets/components/DanceAreas';
+import Testimonials from './assets/components/Testimonials';
 import Team from './assets/components/Team';
 
 import ImportantInfo from './assets/components/ImportantInfo';
@@ -38,8 +39,9 @@ function App() {
                 <>
                   <Hero />
                   <NewsGallery />
-                  <ImportantInfo />
                   <DanceAreas />
+                  <h2 style={{ textAlign: 'center', margin: '2.5rem 0 1.5rem 0' }}>Testimonios de familias y estudiantes</h2>
+                  <Testimonials />
                 </>
               } />
               <Route path="/about" element={<About />} />

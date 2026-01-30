@@ -3,6 +3,129 @@ import { useNavigate, useParams } from "react-router-dom";
 import { classService } from "../../services/classService";
 import "../styles/ClassStudentsPage.css"; // opcional, podés reutilizar tu CSS actual
 
+// Estilos en línea para mejorar la apariencia visual
+const styles = {
+  page: {
+    maxWidth: 700,
+    margin: "40px auto 0 auto",
+    background: "#fff",
+    borderRadius: 18,
+    boxShadow: "0 4px 32px 0 rgba(80, 40, 120, 0.10)",
+    padding: 32,
+    minHeight: 500,
+    fontFamily: 'Inter, Segoe UI, Arial, sans-serif',
+  },
+  header: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 32,
+    borderBottom: "2px solid #e0e0f7",
+    paddingBottom: 16,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 800,
+    color: "#4B2178",
+    letterSpacing: 0.5,
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+  },
+  btnCancel: {
+    background: "#fff",
+    color: "#b23b5a",
+    border: "1.5px solid #b23b5a",
+    borderRadius: 8,
+    padding: "8px 18px",
+    fontWeight: 600,
+    fontSize: 16,
+    cursor: "pointer",
+    marginRight: 8,
+    transition: "background 0.2s, color 0.2s",
+  },
+  btnSave: {
+    background: "linear-gradient(90deg, #7b2ff2 0%, #f357a8 100%)",
+    color: "#fff",
+    border: "none",
+    borderRadius: 8,
+    padding: "8px 22px",
+    fontWeight: 700,
+    fontSize: 16,
+    cursor: "pointer",
+    boxShadow: "0 2px 8px 0 rgba(123,47,242,0.10)",
+    transition: "background 0.2s, color 0.2s",
+  },
+  filtersSection: {
+    margin: "32px 0 18px 0",
+    display: "flex",
+    flexDirection: "column",
+    gap: 12,
+  },
+  filterInput: {
+    border: "1.5px solid #e0e0f7",
+    borderRadius: 8,
+    padding: "10px 14px",
+    fontSize: 16,
+    width: "100%",
+    outline: "none",
+    marginTop: 4,
+    background: "#faf8ff",
+    color: "#4B2178",
+    fontWeight: 500,
+    boxSizing: "border-box",
+  },
+  btnSelectAll: {
+    background: "#f3e6ff",
+    color: "#7b2ff2",
+    border: "1.5px solid #7b2ff2",
+    borderRadius: 8,
+    padding: "7px 16px",
+    fontWeight: 600,
+    fontSize: 15,
+    cursor: "pointer",
+    marginLeft: 8,
+    transition: "background 0.2s, color 0.2s",
+  },
+  studentsList: {
+    marginTop: 18,
+    display: "flex",
+    flexDirection: "column",
+    gap: 12,
+  },
+  studentRow: {
+    display: "flex",
+    alignItems: "center",
+    background: "#f8f6ff",
+    borderRadius: 10,
+    padding: "14px 18px",
+    boxShadow: "0 1px 4px 0 rgba(123,47,242,0.04)",
+    border: "1.5px solid #e0e0f7",
+    fontSize: 17,
+    fontWeight: 500,
+    color: "#4B2178",
+    transition: "background 0.2s, border 0.2s",
+    cursor: "pointer",
+  },
+  studentRowChecked: {
+    background: "linear-gradient(90deg, #f3e6ff 0%, #ffe6f3 100%)",
+    border: "2px solid #f357a8",
+    color: "#b23b5a",
+  },
+  studentTitle: {
+    fontWeight: 700,
+    fontSize: 17,
+    letterSpacing: 0.2,
+  },
+  emptyState: {
+    margin: "40px 0 0 0",
+    textAlign: "center",
+    color: "#b23b5a",
+    fontWeight: 600,
+    fontSize: 18,
+  },
+};
+
 export default function ClassStudentsPage() {
   const { id: classId } = useParams();
   const navigate = useNavigate();
@@ -103,45 +226,67 @@ export default function ClassStudentsPage() {
   };
 
   return (
-    <div className="class-students-page">
-      <div className="management-header">
-        <h2>👥 Estudiantes de la clase</h2>
-
-        <div style={{ display: "flex", gap: 8 }}>
-          <button className="btn-cancel" onClick={() => navigate("/dashboard?section=classes")} disabled={saving || loading}>
+    <div style={styles.page}>
+      <div style={styles.header}>
+        <span style={styles.title}>
+          <span role="img" aria-label="Estudiantes">👥</span> Estudiantes de la clase
+        </span>
+        <div>
+          <button
+            style={styles.btnCancel}
+            onClick={() => navigate("/dashboard?section=classes")}
+            disabled={saving || loading}
+            onMouseOver={e => e.currentTarget.style.background = '#ffe6f3'}
+            onMouseOut={e => e.currentTarget.style.background = '#fff'}
+          >
             ✕ Cancelar
           </button>
-          <button className="btn-submit" onClick={onSave} disabled={saving || loading}>
+          <button
+            style={styles.btnSave}
+            onClick={onSave}
+            disabled={saving || loading}
+          >
             {saving ? "Guardando..." : "✓ Guardar"}
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="empty-state">
+        <div style={styles.emptyState}>
           <p>⚠️ {error}</p>
         </div>
       )}
 
-      <div className="filters-section">
-        <div className="filters-grid">
-          <div className="filter-group">
-            <label>Búsqueda</label>
+      <div style={styles.filtersSection}>
+        <div style={{ display: "flex", gap: 16, alignItems: "end" }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ fontWeight: 600, color: "#7b2ff2" }}>Búsqueda</label>
             <input
-              className="filter-input"
+              style={styles.filterInput}
               placeholder="Buscar por cédula o nombre..."
               value={q}
               onChange={(e) => setQ(e.target.value)}
             />
           </div>
-
-          <div className="filter-group" style={{ display: "flex", alignItems: "end", gap: 8 }}>
+          <div>
             {allFilteredSelected ? (
-              <button className="btn-reset-filters" onClick={unselectAllFiltered} disabled={saving || loading}>
+              <button
+                style={styles.btnSelectAll}
+                onClick={unselectAllFiltered}
+                disabled={saving || loading}
+                onMouseOver={e => e.currentTarget.style.background = '#ffe6f3'}
+                onMouseOut={e => e.currentTarget.style.background = '#f3e6ff'}
+              >
                 Quitar selección (lista)
               </button>
             ) : (
-              <button className="btn-reset-filters" onClick={selectAllFiltered} disabled={saving || loading}>
+              <button
+                style={styles.btnSelectAll}
+                onClick={selectAllFiltered}
+                disabled={saving || loading}
+                onMouseOver={e => e.currentTarget.style.background = '#ffe6f3'}
+                onMouseOut={e => e.currentTarget.style.background = '#f3e6ff'}
+              >
                 Seleccionar todos (lista)
               </button>
             )}
@@ -150,28 +295,36 @@ export default function ClassStudentsPage() {
       </div>
 
       {loading ? (
-        <div className="empty-state">
+        <div style={styles.emptyState}>
           <p>⏳ Cargando...</p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="empty-state">
+        <div style={styles.emptyState}>
           <p>📭 No hay estudiantes para mostrar</p>
-          <small>Verificá que haya estudiantes activos en el grupo y matrículas activas.</small>
+          <small style={{ color: "#7b2ff2", fontWeight: 400 }}>Verificá que haya estudiantes activos en el grupo y matrículas activas.</small>
         </div>
       ) : (
-        <div className="students-list">
+        <div style={styles.studentsList}>
           {filtered.map((s) => {
             const checked = selected.has(s.student_id);
             return (
-              <label key={s.student_id} className={`student-row ${checked ? "checked" : ""}`}>
+              <label
+                key={s.student_id}
+                style={{
+                  ...styles.studentRow,
+                  ...(checked ? styles.studentRowChecked : {}),
+                  opacity: saving ? 0.7 : 1,
+                }}
+              >
                 <input
                   type="checkbox"
                   checked={checked}
                   onChange={() => toggleOne(s.student_id)}
                   disabled={saving}
+                  style={{ marginRight: 16, width: 20, height: 20 }}
                 />
-                <div className="student-meta">
-                  <div className="student-title">
+                <div className="student-meta" style={{ flex: 1 }}>
+                  <div style={styles.studentTitle}>
                     {s.identification} — {s.last_name} {s.first_name}
                   </div>
                 </div>

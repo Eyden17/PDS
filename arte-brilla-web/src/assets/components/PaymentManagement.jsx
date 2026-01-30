@@ -24,7 +24,6 @@ function todayISO() {
 
 const PaymentManagement = () => {
   // ===== data =====
-  const [students, setStudents] = useState([]);
   const [groups, setGroups] = useState([]);
   const [fees, setFees] = useState([]); 
 
@@ -101,7 +100,6 @@ const PaymentManagement = () => {
       // 1) estudiantes
       const sRes = await studentService.getAllStudents({ limit: 200, offset: 0 });
       const sRows = sRes?.data ?? sRes ?? [];
-      setStudents(sRows);
       
       const gRes = await classService.listGroups();
       const gRows = gRes?.data ?? gRes ?? [];
@@ -171,7 +169,6 @@ const PaymentManagement = () => {
       setFees(mapped);
     } catch (e) {
       setError(e?.message || "Error cargando pagos");
-      setStudents([]);
       setFees([]);
     } finally {
       setLoading(false);
@@ -217,10 +214,6 @@ const PaymentManagement = () => {
   const totalAbonado = filteredRows.reduce((sum, r) => sum + Number(r.amount_paid_total || 0), 0);
   const paymentPercentage = totalOriginal > 0 ? Math.round((totalAbonado / totalOriginal) * 100) : 0;
 
-  const groupsFromStudents = useMemo(() => {
-    const set = new Set((students || []).map((s) => s.group_name ?? s.group).filter(Boolean));
-    return Array.from(set);
-  }, [students]);
 
   // ===== pagos =====
   const openAbono = (row) => {

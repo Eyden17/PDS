@@ -45,27 +45,9 @@ const NewsManagement = () => {
   const getCategoryIcon = (cat) =>
     iconoCategoria[(cat || '').toLowerCase()] || 'fa-layer-group';
 
-  // =========================
-  // Helpers: categoría UI <-> DB
-  // DB (según tu schema): 'ANUNCIO','RECITAL','PRESENTACIÓN','TALLER','OTRO'
-  // =========================
-  const toDbCategory = (uiCat) => {
-    const c = (uiCat || '').toLowerCase();
-    if (c === 'anuncio') return 'ANUNCIO';
-    if (c === 'recital') return 'RECITAL';
-    if (c === 'presentación' || c === 'presentacion') return 'PRESENTACIÓN';
-    if (c === 'taller') return 'TALLER';
-    return 'OTRO';
-  };
 
-  const fromDbCategory = (dbCat) => {
-    const c = (dbCat || '').toUpperCase();
-    if (c === 'ANUNCIO') return 'ANUNCIO';
-    if (c === 'RECITAL') return 'RECITAL';
-    if (c === 'PRESENTACIÓN' || c === 'PRESENTACION') return 'PRESENTACIÓN';
-    if (c === 'TALLER') return 'TALLER';
-    return 'OTRO';
-  };
+
+  
 
   // =========================
   // Cargar noticias desde API
@@ -358,17 +340,25 @@ const NewsManagement = () => {
             <div className="stat-value">{statsActivas}</div>
           </div>
         </div>
-        {Object.entries(categoriaStats).map(([cat, count]) => (
-          <div key={cat} className="stat-card">
-            <div className="stat-icon">
-              <i className={`fa-solid ${getCategoryIcon(cat)}`} aria-hidden="true"></i>
+        {Object.entries(categoriaStats).map(([cat, count]) => {
+          // Elige un emoji colorido para cada categoría
+          const emojiCategoria = {
+            ANUNCIO: '📢',
+            RECITAL: '🎤',
+            'PRESENTACIÓN': '🏆',
+            TALLER: '🧑‍🏫',
+            OTRO: '🗂️'
+          };
+          return (
+            <div key={cat} className="stat-card">
+              <div className="stat-icon">{emojiCategoria[cat] || '🗂️'}</div>
+              <div className="stat-content">
+                <div className="stat-label">{cat}</div>
+                <div className="stat-value">{count}</div>
+              </div>
             </div>
-            <div className="stat-content">
-              <div className="stat-label">{cat}</div>
-              <div className="stat-value">{count}</div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Filtros */}

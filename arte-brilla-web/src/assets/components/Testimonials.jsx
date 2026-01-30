@@ -1,10 +1,5 @@
 import React from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/effect-fade';
+// importación de Swiper eliminada para versión en grilla
 import '../styles/Testimonials.css';
 
 const Testimonials = () => {
@@ -39,58 +34,33 @@ const Testimonials = () => {
     }
   ];
 
+  // Estilo polaroid: tarjeta con marco, avatar inicial, texto y nombre manuscrito
+  function getInitials(name) {
+    return name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
+  }
   return (
     <section className="testimonials-section">
       <div className="container">
-        <div className="carousel-wrapper">
-          <Swiper
-            modules={[Navigation, Pagination, Autoplay, EffectFade]}
-            effect="fade"
-            fadeEffect={{ crossFade: true }}
-            spaceBetween={30}
-            slidesPerView={1}
-            autoplay={{
-              delay: 5000,
-              disableOnInteraction: false,
-            }}
-            pagination={{
-              clickable: true,
-              bulletActiveClass: 'swiper-pagination-bullet-active',
-              bulletClass: 'swiper-pagination-bullet'
-            }}
-            navigation={{
-              nextEl: '.testimonials-next',
-              prevEl: '.testimonials-prev',
-            }}
-            loop={true}
-            className="testimonials-swiper"
-          >
-            {testimonials.map(testimonial => (
-              <SwiperSlide key={testimonial.id}>
-                <div className="testimonial-card">
-                  <div className="testimonial-stars">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <span key={i} className="star">⭐</span>
-                    ))}
-                  </div>
-                  <blockquote className="testimonial-quote">
-                    "{testimonial.quote}"
-                  </blockquote>
-                  <div className="testimonial-author">
-                    <h4>{testimonial.author}</h4>
-                    <p>{testimonial.role}</p>
-                  </div>
+        <div className="testimonials-polaroid-list">
+          {testimonials.map((testimonial) => (
+            <div key={testimonial.id} className="testimonial-polaroid">
+              <div className="polaroid-avatar">
+                <span>{getInitials(testimonial.author)}</span>
+              </div>
+              <div className="polaroid-content">
+                <blockquote className="polaroid-quote">{testimonial.quote}</blockquote>
+                <div className="testimonial-stars">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <span key={i} className="star">⭐</span>
+                  ))}
                 </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-
-          <button className="carousel-btn testimonials-prev">
-            <span>←</span>
-          </button>
-          <button className="carousel-btn testimonials-next">
-            <span>→</span>
-          </button>
+              </div>
+              <div className="polaroid-footer">
+                <span className="polaroid-author">{testimonial.author}</span>
+                <span className="polaroid-role">{testimonial.role}</span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

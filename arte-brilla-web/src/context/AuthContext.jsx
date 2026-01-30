@@ -1,27 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AuthContext } from './AuthContextProvider';
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null); // { role, email, id }
-  const [loading, setLoading] = useState(true);
+  const [session] = useState(() => {
+    const raw = localStorage.getItem("ab_session");
+    return raw ? JSON.parse(raw) : null;
+  });
+  const [isAuthenticated, setIsAuthenticated] = useState(!!(session?.accessToken && session?.user));
+  const [user, setUser] = useState(session?.user ?? null); // { role, email, id }
+  const [loading] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
-
-  useEffect(() => {
-    const raw = localStorage.getItem("ab_session");
-    const session = raw ? JSON.parse(raw) : null;
-
-    if (session?.accessToken && session?.user) {
-      setIsAuthenticated(true);
-      setUser(session.user);
-    } else {
-      setIsAuthenticated(false);
-      setUser(null);
-    }
-
-    setLoading(false);
-  }, []);
 
   const login = async (email, password) => {
     const res = await fetch(`${API_URL}/api/auth/login`, {
