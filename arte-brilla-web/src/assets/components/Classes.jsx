@@ -1,19 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { classesData } from '../../data/classesData';
+import { classService } from '../../services/classService';
 import '../styles/Classes.css';
 
 function Classes() {
+  const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    classService.listPublic()
+      .then(data => setClasses(data))
+      .catch(err => console.error(err))
+      .finally(() => setLoading(false));
+  }, []);
+
   const [selectedArea, setSelectedArea] = useState(null);
 
   const areas = [
-    { id: 'Arte Brilla Babys', label: 'Arte Brilla Babys', color: '#ec4899', icon: '👶', description: '3-5 años' },
+    { id: 'Babies', label: 'Arte Brilla Babys', color: '#ec4899', icon: '👶', description: '3-5 años' },
     { id: 'Baby Shine', label: 'Baby Shine', color: '#22d3ee', icon: '🌟', description: '4-6 años' },
-    { id: 'Arte Brilla Minis', label: 'Arte Brilla Minis', color: '#8b5cf6', icon: '🎀', description: '6+ años' },
-    { id: 'Arte Profética Brilla', label: 'Arte Profética Brilla', color: '#f4a460', icon: '✨', description: 'Todas las edades' }
+    { id: 'Minies', label: 'Arte Brilla Minis', color: '#8b5cf6', icon: '🎀', description: '6+ años' },
+    { id: 'Arte Profetica', label: 'Arte Profética Brilla', color: '#f4a460', icon: '✨', description: 'Todas las edades' }
   ];
 
   const getClassesByArea = (areaId) => {
-    return classesData.filter(clase => clase.area === areaId);
+    return classes.filter(clase => clase.group_name === areaId);
   };
 
   return (
