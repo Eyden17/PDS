@@ -11,6 +11,8 @@ export const classService = {
     return apiFetch(`/api/classes?${params.toString()}`);
   },
 
+  listPublic: () => apiFetch("/api/classes/public"),
+
   getById: (id) => apiFetch(`/api/classes/${id}`),
 
   create: (payload) =>
