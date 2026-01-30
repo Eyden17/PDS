@@ -16,32 +16,26 @@ export const authService = {
     return data;
   },
 
-  // POST /api/auth/forgot-password
-  forgotPassword: async (email) => {
-    return apiFetch('/api/auth/forgot-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
-    });
-  },
+  requestPasswordResetOtp: (email) =>
+    apiFetch("/api/auth/otp/request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    }),
 
-  // POST /api/auth/verify-code
-  verifyCode: async (email, code) => {
-    return apiFetch('/api/auth/verify-code', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, code })
-    });
-  },
+  verifyPasswordResetOtp: (email, code) =>
+    apiFetch("/api/auth/otp/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, code }),
+    }),
 
-  // POST /api/auth/reset-password
-  resetPassword: async (email, code, newPassword) => {
-    return apiFetch('/api/auth/reset-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, code, newPassword })
-    });
-  },
+  resetPasswordWithOtp: (email, code, newPassword) =>
+    apiFetch("/api/auth/otp/reset", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, code, new_password: newPassword }),
+    }),
 
   logout: () => {
     localStorage.removeItem('ab_session');
