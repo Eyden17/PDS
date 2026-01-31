@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './assets/components/Navbar';
 import ScreenSizeWarning from './assets/components/ScreenSizeWarning.jsx';
@@ -25,11 +25,21 @@ import ClassStudentsPage from "./assets/components/ClassStudentsPage";
 
 import './assets/styles/App.css'
 
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 function App() {
   const enableAdmin = import.meta.env.VITE_ENABLE_ADMIN === 'true';
 
   return (
     <Router>
+      <ScrollToTop />
       <AuthProvider>
         <div className="app">
           <ScreenSizeWarning />
