@@ -607,12 +607,38 @@
 
 .obs-text {
   display: block;
-  max-width: 150px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   color: #999;
   font-size: 13px;
+  max-height: 2.8em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.obs-text.expanded {
+  max-height: none;
+  overflow: visible;
+}
+
+.obs-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.obs-toggle {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: #667eea;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.obs-toggle:hover {
+  color: #764ba2;
+  text-decoration: underline;
 }
 
 .action-buttons {

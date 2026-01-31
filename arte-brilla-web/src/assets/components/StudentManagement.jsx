@@ -24,6 +24,7 @@ const StudentManagement = () => {
   const [filterName, setFilterName] = useState('');
   const [filterAgeRange, setFilterAgeRange] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [expandedObsId, setExpandedObsId] = useState(null);
 
   const [formData, setFormData] = useState({
     cedula: '',
@@ -605,7 +606,9 @@ const StudentManagement = () => {
                   onChange={handleInputChange}
                   placeholder="Añade cualquier observación importante..."
                   rows="3"
+                  maxLength={100}
                 />
+                <small>{(formData.observaciones || '').length}/100</small>
               </div>
             </div>
 
@@ -758,7 +761,28 @@ const StudentManagement = () => {
               </td>
 
               <td className="col-obs">
-                <span className="obs-text">{s.observaciones || '-'}</span>
+                {s.observaciones ? (
+                  <div className="obs-cell">
+                    <span className={`obs-text ${expandedObsId === s.id ? 'expanded' : ''}`}>
+                      {expandedObsId === s.id
+                        ? s.observaciones
+                        : `${s.observaciones.slice(0, 30)}${s.observaciones.length > 30 ? '...' : ''}`}
+                    </span>
+                    {s.observaciones.length > 30 && (
+                      <button
+                        type="button"
+                        className="obs-toggle"
+                        onClick={() =>
+                          setExpandedObsId(expandedObsId === s.id ? null : s.id)
+                        }
+                      >
+                        {expandedObsId === s.id ? 'Ver menos' : 'Ver más'}
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <span className="obs-text">-</span>
+                )}
               </td>
 
               <td className="col-actions">

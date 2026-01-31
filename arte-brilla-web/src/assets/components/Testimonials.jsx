@@ -1,46 +1,55 @@
-import React from 'react';
-// importación de Swiper eliminada para versión en grilla
+import React, { useEffect, useState } from 'react';
 import '../styles/Testimonials.css';
+import { testimonialsService } from '../../services/testimonialsService';
 
 const Testimonials = () => {
-  const testimonials = [
-    {
-      id: 1,
-      quote: "Mi hijo ha mejorado mucho en confianza desde que comenzó en Arte Brilla. Los instructores son muy dedicados.",
-      author: "María García",
-      role: "Madre de estudiante Babies",
-      rating: 5
-    },
-    {
-      id: 2,
-      quote: "La metodología profesional y el ambiente amigable hacen que mis hijas disfruten venir a clases.",
-      author: "Juan López",
-      role: "Padre de estudiantes Minies",
-      rating: 5
-    },
-    {
-      id: 3,
-      quote: "Estoy muy agradecida con el equipo docente. Han ayudado a mis hijas a encontrar su pasión por la danza.",
-      author: "Carmen Rodríguez",
-      role: "Madre de estudiante Artes Proféticas",
-      rating: 5
-    },
-    {
-      id: 4,
-      quote: "Los eventos que organizan son increíbles. El nivel profesional es realmente notorio.",
-      author: "Elena Martínez",
-      role: "Abuela de estudiante",
-      rating: 5
-    }
-  ];
+  const [testimonials, setTestimonials] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // Estilo polaroid: tarjeta con marco, avatar inicial, texto y nombre manuscrito
-  function getInitials(name) {
-    return name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
+  function getInitials(name = '') {
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return '';
+    const a = parts[0]?.[0] ?? '';
+    const b = (parts.length > 1 ? parts[parts.length - 1][0] : '') ?? '';
+    return (a + b).toUpperCase();
   }
+
+  const fetchTestimonials = async () => {
+    setLoading(true);
+    try {
+      const res = await testimonialsService.listPublic();
+      const rows = res?.data ?? res ?? [];
+      const normalized = (rows || []).map((r) => ({
+        id: r.id,
+        quote: r.text,
+        author: r.author_name,
+        role: r.author_role || '',
+        rating: Number(r.rating || 5),
+      }));
+      setTestimonials(normalized);
+    } catch (err) {
+      console.error('Error cargando reseñas:', err);
+      setTestimonials([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTestimonials();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <section className="testimonials-section">
       <div className="container">
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '24px' }}>Cargando reseñas…</div>
+        ) : testimonials.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '24px' }}>
+            Aún no hay reseñas publicadas.
+          </div>
+        ) : (
         <div className="testimonials-polaroid-list">
           {testimonials.map((testimonial) => (
             <div key={testimonial.id} className="testimonial-polaroid">
@@ -62,6 +71,7 @@ const Testimonials = () => {
             </div>
           ))}
         </div>
+        )}
       </div>
     </section>
   );

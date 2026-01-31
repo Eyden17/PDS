@@ -1,20 +1,27 @@
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/useAuth';
 import '../styles/TestimonialsPage.css';
+import { testimonialsService } from '../../services/testimonialsService';
 
-// Datos de ejemplo
-const initialTestimonials = [
-  { id: 1, initials: 'MG', name: 'María García', relation: 'Madre de estudiante Babies', text: 'Mi hijo ha mejorado mucho en confianza desde que comenzó en Arte Brilla. Los instructores son muy dedicados.', rating: 5 },
-  { id: 2, initials: 'JL', name: 'Juan López', relation: 'Padre de estudiantes Minies', text: 'La metodología profesional y el ambiente amigable hacen que mis hijas disfruten venir a clases.', rating: 5 },
-  { id: 3, initials: 'CR', name: 'Carmen Rodríguez', relation: 'Madre de estudiante Artes Proféticas', text: 'Estoy muy agradecida con el equipo docente. Han ayudado a mis hijas a encontrar su pasión por la danza.', rating: 5 },
-  { id: 4, initials: 'EM', name: 'Elena Martínez', relation: 'Abuela de estudiante', text: 'Los eventos que organizan son increíbles. El nivel profesional es realmente notorio.', rating: 5 },
-];
 
 const TestimonialsPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const role = user?.role || '';
+  const isTeacher = String(role).toUpperCase() === 'TEACHER';
+const getInitials = (name = '') => {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '';
+  const a = parts[0]?.[0] ?? '';
+  const b = (parts.length > 1 ? parts[parts.length - 1][0] : '') ?? '';
+  return (a + b).toUpperCase();
+};
+
   // Estado principal
-  const [testimonials, setTestimonials] = useState(initialTestimonials);
+  const [testimonials, setTestimonials] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [filterName, setFilterName] = useState("");
   const [filterRelation, setFilterRelation] = useState("");
   const [filterRating, setFilterRating] = useState("all");
@@ -23,6 +30,41 @@ const TestimonialsPage = () => {
   const [form, setForm] = useState({ initials: '', name: '', relation: '', text: '', rating: 5 });
   const [toastError, setToastError] = useState("");
   const [deleteId, setDeleteId] = useState(null);
+
+  const fetchTestimonials = async () => {
+    setLoading(true);
+    try {
+      const res = await testimonialsService.list();
+      // Axios: res.data; Fetch wrapper: res directly
+      const rows = res?.data ?? res ?? [];
+      // Normaliza campos desde DB -> UI
+      const normalized = (rows || []).map((r) => ({
+        id: r.id,
+        initials: getInitials(r.author_name),
+        name: r.author_name,
+        relation: r.author_role || '',
+        text: r.text,
+        rating: r.rating,
+        is_published: r.is_published ?? true,
+        created_at: r.created_at,
+      }));
+      setTestimonials(normalized);
+    } catch (err) {
+      console.error(err);
+      setToastError('No se pudieron cargar las reseñas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isTeacher) {
+      navigate('/teacher', { replace: true });
+      return;
+    }
+    fetchTestimonials();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isTeacher, navigate]);
 
   // Filtros
   const filteredTestimonials = useMemo(() => {
@@ -64,20 +106,67 @@ const TestimonialsPage = () => {
   const handleRating = (r) => {
     setForm(f => ({ ...f, rating: r }));
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.text) {
       setToastError("Nombre y testimonio son obligatorios");
       return;
     }
-    if (editing) {
-      setTestimonials(testimonials.map(t => t.id === editing ? { ...form, id: editing } : t));
-    } else {
-      setTestimonials([...testimonials, { ...form, id: Date.now() }]);
+
+    const payload = {
+      author_name: form.name,
+      author_role: form.relation,
+      text: form.text,
+      rating: Number(form.rating || 5),
+      is_published: true, // se publica directo (solo admin crea)
+    };
+
+    try {
+      setLoading(true);
+      if (editing) {
+        const res = await testimonialsService.update(editing, payload);
+        const updated = res?.data ?? res;
+        setTestimonials(testimonials.map(t =>
+          t.id === editing
+            ? {
+                ...t,
+                initials: getInitials(updated?.author_name ?? form.name),
+                name: updated?.author_name ?? form.name,
+                relation: updated?.author_role ?? form.relation,
+                text: updated?.text ?? form.text,
+                rating: updated?.rating ?? Number(form.rating || 5),
+              }
+            : t
+        ));
+      } else {
+        const res = await testimonialsService.create(payload);
+        const created = res?.data ?? res;
+        setTestimonials([
+          ...testimonials,
+          {
+            id: created.id,
+            initials: getInitials(created?.author_name ?? form.name),
+            name: created?.author_name ?? form.name,
+            relation: created?.author_role ?? form.relation,
+            text: created?.text ?? form.text,
+            rating: created?.rating ?? Number(form.rating || 5),
+            is_published: created?.is_published ?? true,
+            created_at: created?.created_at,
+          }
+        ]);
+      }
+
+      setShowForm(false);
+      setEditing(null);
+      setToastError("");
+      // reset
+      setForm({ initials: '', name: '', relation: '', text: '', rating: 5 });
+    } catch (err) {
+      console.error(err);
+      setToastError("No se pudo guardar la reseña");
+    } finally {
+      setLoading(false);
     }
-    setShowForm(false);
-    setEditing(null);
-    setToastError("");
   };
 
   // UI principal
@@ -89,12 +178,16 @@ const TestimonialsPage = () => {
       </button>
       <div className="admin-header-fixed">
         <div className="admin-title-block">
-          <h1 className="admin-title">Panel Administrativo</h1>
+          <h1 className="admin-title">Panel Administrativo {loading ? '· Cargando…' : ''}</h1>
           <p className="admin-header-sub">Gestión de Arte Brilla</p>
         </div>
       </div>
       <div className="testimonials-admin-panel">
-        {toastError && <div className="toast-error">{toastError}</div>}
+        {toastError && (
+          <div className="toast-stack" role="status" aria-live="polite">
+            <div className="toast-error">{toastError}</div>
+          </div>
+        )}
         <div className="testimonials-header">
           <div>
             <h2>Gestión de Testimonios</h2>
