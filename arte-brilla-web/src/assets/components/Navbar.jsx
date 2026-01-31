@@ -56,6 +56,17 @@ const Navbar = () => {
           <li><Link to="/about" className={`nav-link ${location.pathname === '/about' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Nosotros</Link></li>
           <li><Link to="/classes" className={`nav-link ${location.pathname === '/classes' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Clases</Link></li>
           <li><Link to="/contact" className={`nav-link ${location.pathname === '/contact' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Contacto</Link></li>
+          {enableAdmin && !isAuthenticated && (
+            <li className="nav-button-wrapper">
+              <Link
+                to="/login"
+                className={`nav-button ${location.pathname === '/login' ? 'active' : ''}`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Iniciar Sesión
+              </Link>
+            </li>
+          )}
           {enableAdmin && isAuthenticated && (
             <li className="nav-button-wrapper">
               <Link to={panelPath} className={`nav-button ${location.pathname === panelPath ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Panel Admin</Link>
