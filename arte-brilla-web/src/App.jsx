@@ -17,6 +17,7 @@ import Footer from './assets/components/Footer';
 import Login from './assets/components/Login';
 import ForgotPassword from './assets/components/ForgotPassword.jsx';
 import AdminPanel from './assets/components/AdminPanel';
+import TestimonialsPage from './assets/components/TestimonialsPage';
 import ProtectedRoute from './assets/components/ProtectedRoute';
 import NotFound from './assets/components/NotFound';
 import NewsDetail from './assets/components/NewsDetail';
@@ -73,6 +74,16 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <AdminPanel />
+                    </ProtectedRoute>
+                  }
+                />
+              )}
+              {enableAdmin && (
+                <Route
+                  path="/testimonials"
+                  element={
+                    <ProtectedRoute>
+                      <TestimonialsPage />
                     </ProtectedRoute>
                   }
                 />
