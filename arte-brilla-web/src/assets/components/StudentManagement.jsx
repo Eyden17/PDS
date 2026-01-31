@@ -56,8 +56,13 @@ const StudentManagement = () => {
       setLoading(true);
       const res = await studentService.getAllStudents({ limit: 100, offset: 0 });
 
-      // backend recomendado: { data: [...] }
-      const rows = res?.data ?? res ?? [];
+      // backend recomendado: { data: [...] } pero tolera variantes
+      const rows =
+        (Array.isArray(res?.data) && res.data) ||
+        (Array.isArray(res) && res) ||
+        (Array.isArray(res?.rows) && res.rows) ||
+        (Array.isArray(res?.data?.rows) && res.data.rows) ||
+        [];
 
       console.log('Fetched students:', rows);
 
@@ -676,7 +681,7 @@ const StudentManagement = () => {
       </div>
 
       {/* Tabla de Estudiantes */}
-      <div className="students-table-container">
+      <div className="students-table-section">
 
         {loading && (
           <div className="empty-state">
@@ -701,71 +706,88 @@ const StudentManagement = () => {
             <p>No hay estudiantes registrados</p>
           </div>
         ) : (
-          <table className="students-table">
-            <thead>
-              <tr>
-                <th className="col-status">Estado</th>
-                <th className="col-name">Nombre Completo</th>
-                <th className="col-age">Edad</th>
-                <th className="col-group">Grupo</th>
-                <th className="col-guardian">Encargado</th>
-                <th className="col-phone">Teléfono</th>
-                <th className="col-obs">Observaciones</th>
-                <th className="col-actions">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredStudents.map(student => (
-                <tr key={student.id} className={`student-row ${!student.activo ? 'inactive-row' : ''}`}>
-                  <td className="col-status">
-                    <span className={`status-badge ${student.activo ? 'active' : 'inactive'}`}>
-                      {student.activo ? '✓ Activo' : '✗ Inactivo'}
-                    </span>
-                  </td>
-                  <td className="col-name">
-                    <span className={`student-name ${!student.activo ? 'inactive-text' : ''}`}>{student.nombre} {student.apellido} {student.segundoApellido}</span>
-                  </td>
-                  <td className="col-age">
-                    <span className="age-badge">{student.edad || '-'} años</span>
-                  </td>
-                  <td className="col-group">
-                    <span className="group-badge" style={{ borderLeftColor: getGroupColor(student.grupo) }}>
-                      {getGroupIcon(student.grupo)} {student.grupo}
-                    </span>
-                  </td>
-                  <td className="col-guardian">{student.encargado}</td>
-                  <td className="col-phone">
-                    <a href={`tel:${student.telefonoEncargado}`} className="phone-link">
-                      {student.telefonoEncargado}
+
+  <div className="students-table-wrapper">
+    <table className="students-table">
+      <thead>
+        <tr>
+          <th className="col-status">Estado</th>
+          <th className="col-name">Nombre Completo</th>
+          <th className="col-age">Edad</th>
+          <th className="col-group">Grupo</th>
+          <th className="col-guardian">Encargado</th>
+          <th className="col-phone">Teléfono</th>
+          <th className="col-obs">Observaciones</th>
+          <th className="col-actions">Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {filteredStudents.length === 0 ? (
+          <tr className="empty-row">
+            <td colSpan={8} className="empty-message">
+              <p>No hay estudiantes que coincidan con los filtros</p>
+            </td>
+          </tr>
+        ) : (
+          filteredStudents.map((s) => (
+            <tr key={s.id} className="students-row">
+              <td className="col-status">
+                <div className={`status-badge ${s.activo ? "active" : "inactive"}`}>
+                  {s.activo ? "✅ Activo" : "⛔ Inactivo"}
+                </div>
+              </td>
+
+              <td className="col-name">
+                <span className={`student-name ${!s.activo ? 'inactive-text' : ''}`}>{s.nombre} {s.apellido} {s.segundoApellido}</span>
+              </td>
+
+              <td className="col-age">{s.edad} años</td>
+
+              <td className="col-group">
+                    <span className="group-badge" style={{ borderLeftColor: getGroupColor(s.grupo) }}>
+                      {getGroupIcon(s.grupo)} {s.grupo}
+                    </span>              </td>
+
+              <td className="col-guardian">{s.encargado || "-"}</td>
+
+              <td className="col-phone">
+                    <a href={`tel:${s.telefonoEncargado}`} className="phone-link">
+                      {s.telefonoEncargado}
                     </a>
-                  </td>
-                  <td className="col-obs">
-                    <span className="obs-text">{student.observaciones || '-'}</span>
-                  </td>
-                  <td className="col-actions">
-                    {!isTeacher && (
-                      <div className="action-buttons">
-                        <button
-                          className="btn-action btn-edit"
-                          onClick={() => handleEditStudent(student)}
-                          title="Editar"
-                        >
-                          ✏️
-                        </button>
-                        <button
-                          className="btn-action btn-delete"
-                          onClick={() => handleDeleteStudent(student.id)}
-                          title="Eliminar"
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              </td>
+
+              <td className="col-obs">
+                <span className="obs-text">{s.observaciones || '-'}</span>
+              </td>
+
+              <td className="col-actions">
+                {!isTeacher && (
+                  <div className="action-buttons">
+                    <button
+                      className="btn-action btn-edit"
+                      onClick={() => handleEditStudent(s)}
+                      title="Editar"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      className="btn-action btn-delete"
+                      onClick={() => handleDeleteStudent(s.id)}
+                      title="Eliminar"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                )}
+              </td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  </div>
+
         ))}
       </div>
 
