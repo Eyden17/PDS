@@ -1,5 +1,6 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import emailjs from '@emailjs/browser';
 import { authService } from '../../services/authService';
 import '../styles/ForgotPassword.css';
 
@@ -8,11 +9,24 @@ const ForgotPassword = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [step, setStep] = useState(1); // 1: email, 2: código, 3: nueva contraseÃ±a
+  const [step, setStep] = useState(1); // 1: email, 2: código, 3: nueva contraseña
   const [code, setCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
+  const toastTimer = useRef(null);
+
+  useEffect(() => {
+    emailjs.init(import.meta.env.VITE_PUBLIC_KEY);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimer.current) {
+        clearTimeout(toastTimer.current);
+      }
+    };
+  }, []);
 
   const handleSendEmail = async (e) => {
     e.preventDefault();
@@ -21,11 +35,42 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      await authService.requestPasswordResetOtp(email);
-      setMessage('Se ha enviado un código de recuperación a tu correo. Por favor revisa tu bandeja de entrada.');
+      const response = await authService.requestPasswordResetOtp(email);
+      const otpCode = response?.code;
+
+      if (!otpCode) {
+        setMessage(
+          'Si el correo está registrado, recibirás un código de recuperación. Revisa tu bandeja de entrada.'
+        );
+        setStep(2);
+        return;
+      }
+
+      const serviceId = import.meta.env.VITE_SERVICE_ID;
+      const templateId =
+        import.meta.env.VITE_RESET_TEMPLATE_ID || import.meta.env.VITE_TEMPLATE_ID;
+      const publicKey = import.meta.env.VITE_PUBLIC_KEY;
+
+      if (!serviceId || !templateId || !publicKey) {
+        throw new Error('Falta configurar EmailJS en el entorno.');
+      }
+
+      await emailjs.send(
+        serviceId,
+        templateId,
+        {
+          email: email,
+          otp: otpCode,
+        },
+        { publicKey }
+      );
+
+      setMessage(
+        'Se ha enviado un código de recuperación a tu correo. Por favor, revisa tu bandeja de entrada.'
+      );
       setStep(2);
     } catch (e) {
-      setError(e?.message || 'Error de conexión. Por favor intenta de nuevo.');
+      setError(e?.message || 'Error de conexión. Por favor, intentá de nuevo.');
     }
 
     setIsLoading(false);
@@ -39,10 +84,12 @@ const ForgotPassword = () => {
 
     try {
       await authService.verifyPasswordResetOtp(email, code);
-      setMessage('Código verificado correctamente. Ahora puedes crear una nueva contraseña.');
+      setMessage(
+        'Código verificado correctamente. Ahora puedes crear una nueva contraseña.'
+      );
       setStep(3);
     } catch (e) {
-      setError(e?.message || 'Error de conexión. Por favor intenta de nuevo.');
+      setError(e?.message || 'Error de conexión. Por favor, intentá de nuevo.');
     }
 
     setIsLoading(false);
@@ -67,12 +114,14 @@ const ForgotPassword = () => {
 
     try {
       await authService.resetPasswordWithOtp(email, code, newPassword);
-      setMessage('Contraseña actualizada correctamente. Redirigiendo al login...');
+      setMessage(
+        'Contraseña actualizada correctamente. Redirigiendo al login...'
+      );
       setTimeout(() => {
         navigate('/login');
       }, 2000);
     } catch (e) {
-      setError(e?.message || 'Error de conexión. Por favor intenta de nuevo.');
+      setError(e?.message || 'Error de conexión. Por favor, intentá de nuevo.');
     }
 
     setIsLoading(false);
@@ -82,15 +131,28 @@ const ForgotPassword = () => {
     <div className="forgot-password-container">
       <div className="forgot-password-card">
         <div className="forgot-password-header">
-          <div className="forgot-password-icon" aria-label="Icono de seguridad">🔐</div>
+          <div
+            className="forgot-password-icon"
+            aria-label="Ícono de seguridad"
+          >
+            🔐
+          </div>
           <h1>Recuperar Contraseña</h1>
-          <p className="forgot-password-subtitle">Arte Brilla - Academia de Danza</p>
+          <p className="forgot-password-subtitle">
+            Arte Brilla - Academia de Danza
+          </p>
         </div>
 
         {/* Paso 1: Enviar email */}
         {step === 1 && (
-          <form onSubmit={handleSendEmail} className="forgot-password-form" noValidate>
-            <p className="step-description">Ingresa tu correo electrónico para recibir un código de recuperación</p>
+          <form
+            onSubmit={handleSendEmail}
+            className="forgot-password-form"
+            noValidate
+          >
+            <p className="step-description">
+              Ingresa tu correo electrónico para recibir un código de recuperación
+            </p>
             <div className="form-group">
               <label htmlFor="email">Correo Electrónico</label>
               <input
@@ -106,8 +168,16 @@ const ForgotPassword = () => {
               />
             </div>
 
-            {error && <div className="error-message" role="alert">{error}</div>}
-            {message && <div className="success-message" role="status">{message}</div>}
+            {error && (
+              <div className="error-message" role="alert">
+                {error}
+              </div>
+            )}
+            {message && (
+              <div className="success-message" role="status">
+                {message}
+              </div>
+            )}
 
             <button
               type="submit"
@@ -121,8 +191,14 @@ const ForgotPassword = () => {
 
         {/* Paso 2: Verificar código */}
         {step === 2 && (
-          <form onSubmit={handleVerifyCode} className="forgot-password-form" noValidate>
-            <p className="step-description">Ingresa el código que recibiste por correo</p>
+          <form
+            onSubmit={handleVerifyCode}
+            className="forgot-password-form"
+            noValidate
+          >
+            <p className="step-description">
+              Ingresa el código que recibiste por correo
+            </p>
             <div className="form-group">
               <label htmlFor="code">Código de Recuperación</label>
               <input
@@ -134,14 +210,22 @@ const ForgotPassword = () => {
                 disabled={isLoading}
                 required
                 autoFocus
-                maxLength="6"
+                maxLength={6}
                 autoComplete="off"
                 inputMode="numeric"
               />
             </div>
 
-            {error && <div className="error-message" role="alert">{error}</div>}
-            {message && <div className="success-message" role="status">{message}</div>}
+            {error && (
+              <div className="error-message" role="alert">
+                {error}
+              </div>
+            )}
+            {message && (
+              <div className="success-message" role="status">
+                {message}
+              </div>
+            )}
 
             <button
               type="submit"
@@ -164,8 +248,13 @@ const ForgotPassword = () => {
 
         {/* Paso 3: Nueva contraseña */}
         {step === 3 && (
-          <form onSubmit={handleResetPassword} className="forgot-password-form" noValidate>
+          <form
+            onSubmit={handleResetPassword}
+            className="forgot-password-form"
+            noValidate
+          >
             <p className="step-description">Crea una nueva contraseña</p>
+
             <div className="form-group">
               <label htmlFor="newPassword">Nueva Contraseña</label>
               <input
@@ -178,12 +267,14 @@ const ForgotPassword = () => {
                 required
                 autoFocus
                 autoComplete="new-password"
-                minLength="6"
+                minLength={6}
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="confirmPassword">Confirmar Contraseña</label>
+              <label htmlFor="confirmPassword">
+                Confirmar Contraseña
+              </label>
               <input
                 type="password"
                 id="confirmPassword"
@@ -193,12 +284,20 @@ const ForgotPassword = () => {
                 disabled={isLoading}
                 required
                 autoComplete="new-password"
-                minLength="6"
+                minLength={6}
               />
             </div>
 
-            {error && <div className="error-message" role="alert">{error}</div>}
-            {message && <div className="success-message" role="status">{message}</div>}
+            {error && (
+              <div className="error-message" role="alert">
+                {error}
+              </div>
+            )}
+            {message && (
+              <div className="success-message" role="status">
+                {message}
+              </div>
+            )}
 
             <button
               type="submit"
@@ -221,7 +320,10 @@ const ForgotPassword = () => {
 
         <div className="forgot-password-footer">
           <p>
-            ¿Recordaste tu contraseña? <Link to="/login" className="forgot-password-link">Volver al login</Link>
+            ¿Recordaste tu contraseña?{' '}
+            <Link to="/login" className="forgot-password-link">
+              Volver al login
+            </Link>
           </p>
         </div>
       </div>
