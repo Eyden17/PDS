@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './assets/components/Navbar';
 import ScreenSizeWarning from './assets/components/ScreenSizeWarning.jsx';
@@ -17,6 +17,7 @@ import Footer from './assets/components/Footer';
 import Login from './assets/components/Login';
 import ForgotPassword from './assets/components/ForgotPassword.jsx';
 import AdminPanel from './assets/components/AdminPanel';
+import TestimonialsPage from './assets/components/TestimonialsPage';
 import ProtectedRoute from './assets/components/ProtectedRoute';
 import NotFound from './assets/components/NotFound';
 import NewsDetail from './assets/components/NewsDetail';
@@ -24,11 +25,21 @@ import ClassStudentsPage from "./assets/components/ClassStudentsPage";
 
 import './assets/styles/App.css'
 
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 function App() {
   const enableAdmin = import.meta.env.VITE_ENABLE_ADMIN === 'true';
 
   return (
     <Router>
+      <ScrollToTop />
       <AuthProvider>
         <div className="app">
           <ScreenSizeWarning />
@@ -73,6 +84,16 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <AdminPanel />
+                    </ProtectedRoute>
+                  }
+                />
+              )}
+              {enableAdmin && (
+                <Route
+                  path="/testimonials"
+                  element={
+                    <ProtectedRoute>
+                      <TestimonialsPage />
                     </ProtectedRoute>
                   }
                 />

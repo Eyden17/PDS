@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
 import StudentManagement from './StudentManagement';
 import PaymentManagement from './PaymentManagement';
@@ -10,6 +10,7 @@ import '../styles/AdminPanel.css';
 
 const AdminPanel = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('dashboard');
   const { user } = useAuth();
   const role = user?.role || '';
@@ -117,6 +118,15 @@ const AdminPanel = () => {
                   <p>Genera reportes y estadísticas de la academia</p>
                   <button className="card-button" onClick={() => setActiveSection('reports')}>Ver Reportes</button>
                 </div>
+
+                 {/* sección de testimonios */}
+                <div className="admin-card">
+                  <div className="card-icon">📝</div>
+                  <h2>Testimonios</h2>
+                  <p>Generar testimonios, editar y eliminar</p>
+                  <button className="card-button" onClick={() => navigate('/testimonials')}>Ver testimonios</button>
+                </div>
+
               </>
             )}
           </div>
